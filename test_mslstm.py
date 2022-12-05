@@ -44,8 +44,8 @@ def main():
     label_file = "data/Frames_label.csv"
 
     data_dir = os.path.join(base_dir, "data")
-    vid_out_dir = os.path.join(base_dir, "results", dataset, topology)
-    label_out_dir = os.path.join("results", dataset, topology)
+    vid_out_dir = os.path.join(base_dir, "results", dataset, topology, "Videos")
+    label_out_dir = os.path.join("results", dataset, topology, "CSV")
 
     df_label = pd.read_csv(label_file)
     scenarios = ["Coffee_room", "Home"]

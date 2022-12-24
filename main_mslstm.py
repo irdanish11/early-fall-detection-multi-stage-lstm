@@ -1,3 +1,4 @@
+import json
 import os
 import cv2
 import time
@@ -98,6 +99,7 @@ def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
     f = 0
     act_fts = []
     pred_label = [''] * len(frames_label)
+    pred_scores = [''] * len(frames_label)
     action_features = ActionFeatures(
         context_weight_file='data/model_weights/context_best.h5',
         action_weight_file='data/model_weights/action_best.h5',
@@ -169,6 +171,7 @@ def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
 
             action = 'pending..'
             action_name = action
+            out = 0
             clr = (0, 255, 0)
             # Use 30 frames time-steps to prediction.
 
@@ -204,6 +207,7 @@ def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
                                     cv2.FONT_HERSHEY_COMPLEX,
                                     0.4, clr, 1)
                 pred_label[f - 1] = action_name
+                pred_scores[f - 1] = list(out)
 
         # Show Frame.
         frame = cv2.resize(frame, (0, 0), fx=2., fy=2.)
@@ -232,6 +236,7 @@ def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
     if outvid:
         writer.release()
     cv2.destroyAllWindows()
+    json_data = {"scores": pred_scores, "classes": action_model.class_names}
     frames_label['mslstm_pred_label'] = pred_label
     pred_time = [''] * len(pred_label)
     frames_label['mslstm_pred_time'] = pred_time
@@ -241,6 +246,9 @@ def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
     except:
         pass
     os.makedirs('results', exist_ok=True)
+    json_path = label_out_csv.replace(".csv", ".json")
+    with open(json_path, 'w') as f:
+        json.dump(json_data, f)
     if os.path.exists(label_out_csv):
         frames_label.to_csv(label_out_csv, mode='w+', index=False)
     else:

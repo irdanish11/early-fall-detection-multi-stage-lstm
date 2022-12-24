@@ -63,7 +63,7 @@ def main():
         print("\n\nStarting Video Test\n\n")
         for i, vid in enumerate(videos):
             print("\n\n================================")
-            print(f"Videos: {i}/{len(videos)}")
+            print(f"Videos: {i+1}/{len(videos)}")
             source = os.path.join(vid_path, vid)
             ext = vid.split('.')[-1]
             vid_name = vid.split('.')[0].replace(" ", "")

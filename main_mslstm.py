@@ -171,7 +171,7 @@ def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
 
             action = 'pending..'
             action_name = action
-            out = 0
+            out = []
             clr = (0, 255, 0)
             # Use 30 frames time-steps to prediction.
 

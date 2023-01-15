@@ -101,15 +101,15 @@ def check_false_neg(y_true, y_pred, c):
     return y_pred
 
 
-def compute_roc_auc(df_pred: pd.DataFrame, y_score: np.ndarray, n_classes: int):
+def compute_roc_auc(df_pred: pd.DataFrame, y_score: np.ndarray, classes: List[str]):
     labels = np.array(df_pred.label.array).reshape(-1, 1)
     y_test = OneHotEncoder(sparse=False).fit_transform(labels)
     fpr = dict()
     tpr = dict()
     roc_auc = dict()
-    for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(y_test[:, i], y_score[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
+    for i, c in enumerate(classes):
+        fpr[c], tpr[c], _ = roc_curve(y_test[:, i], y_score[:, i])
+        roc_auc[c] = auc(fpr[c], tpr[c])
 
     # Compute micro-average ROC curve and ROC area
     fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
@@ -119,10 +119,10 @@ def compute_roc_auc(df_pred: pd.DataFrame, y_score: np.ndarray, n_classes: int):
     fpr_grid = np.linspace(0.0, 1.0, 1000)
     # Interpolate all ROC curves at these points
     mean_tpr = np.zeros_like(fpr_grid)
-    for i in range(n_classes):
-        mean_tpr += np.interp(fpr_grid, fpr[i], tpr[i])  # linear interpolation
+    for i, c in enumerate(classes):
+        mean_tpr += np.interp(fpr_grid, fpr[c], tpr[c])  # linear interpolation
     # Average it and compute AUC
-    mean_tpr /= n_classes
+    mean_tpr /= len(classes)
     fpr["macro"] = fpr_grid
     tpr["macro"] = mean_tpr
     roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
@@ -150,7 +150,7 @@ def compute_report(df_pred: pd.DataFrame, classes: List[str]):
 
 def plot_roc(df_pred: pd.DataFrame, y_score: np.ndarray, classes: List[str],
              model_path: str):
-    fpr, tpr, roc_auc, y_test = compute_roc_auc(df_pred, y_score, len(classes))
+    fpr, tpr, roc_auc, y_test = compute_roc_auc(df_pred, y_score, classes)
 
     y_onehot_test = LabelBinarizer().fit_transform(y_test)
 
@@ -190,18 +190,7 @@ def plot_roc(df_pred: pd.DataFrame, y_score: np.ndarray, classes: List[str],
     return fpr, tpr, roc_auc
 
 
-def compute_metrics(df_pred: pd.DataFrame, classes: List[str],
-                    y_score: np.ndarray, model_path: str):
-    report, cm = compute_report(df_pred, classes)
-    fpr, tpr, roc_auc = plot_roc(df_pred, y_score, classes, model_path)
-    spec_sen = {}
-    for c in classes:
-        spec_sen[c] = specificity_sensitivity(df_pred, c)
-        report[c]["specificity"] = spec_sen[c]["specificity"]
-        report[c]["sensitivity"] = spec_sen[c]["sensitivity"]
-    model_title = model_path.replace('/', '-')
-    save_path = os.path.join("results", model_path, "results", model_title)
-
+def plot_cm(cm, classes, save_path, model_title):
     # save confusion matrix
     df_cm = pd.DataFrame(cm, index=classes, columns=classes)
     sns.set(font_scale=1.4)
@@ -212,6 +201,8 @@ def compute_metrics(df_pred: pd.DataFrame, classes: List[str],
     plt.savefig(os.path.join(save_path, "confusion_matrix.png"), dpi=300)
     plt.show()
 
+
+def plot_report(report, save_path, model_title):
     # save classification report
     df_report = pd.DataFrame(report).T
     fig, ax = plt.subplots(figsize=(13, 5))
@@ -224,6 +215,27 @@ def compute_metrics(df_pred: pd.DataFrame, classes: List[str],
     plt.title(f"Classification Report {model_title}")
     plt.savefig(os.path.join(save_path, "classification_report.png"), dpi=300)
     plt.show()
+
+
+def compute_metrics(df_pred: pd.DataFrame, classes: List[str],
+                    y_score: np.ndarray, model_path: str):
+    report, cm = compute_report(df_pred, classes)
+    fpr, tpr, roc_auc = plot_roc(df_pred, y_score, classes, model_path)
+    spec_sen = {}
+    for c in classes:
+        spec_sen[c] = specificity_sensitivity(df_pred, c)
+        report[c]["specificity"] = spec_sen[c]["specificity"]
+        report[c]["sensitivity"] = spec_sen[c]["sensitivity"]
+    model_title = model_path.replace('/', '-')
+    save_path = os.path.join("results", model_path, "results", model_title)
+    # plot confusion matrix
+    plot_cm(cm, classes, save_path, model_title)
+    # plot classification report
+    plot_report(report, save_path, model_title)
+    all_metrics = {
+        "report": report, "cm": cm, "roc_auc": roc_auc,
+    }
+    return all_metrics
 
 
 def read_json(filename):
@@ -278,4 +290,5 @@ def main():
             )
         print(f"Scenario: {scenario} - {i+1}/{len(results)}")
     y_score = np.array(all_scores)
+    all_metrics = compute_metrics(df_pred, classes, y_score, model_path)
 

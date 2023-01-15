@@ -207,7 +207,7 @@ def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
                                     cv2.FONT_HERSHEY_COMPLEX,
                                     0.4, clr, 1)
                 pred_label[f - 1] = action_name
-                pred_scores[f - 1] = list(out)
+                pred_scores[f - 1] = [str(e) for e in out]
 
         # Show Frame.
         frame = cv2.resize(frame, (0, 0), fx=2., fy=2.)

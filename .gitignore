@@ -4,3 +4,5 @@ results
 *docx
 *pth
 *.pptx
+*.png
+tmp.py

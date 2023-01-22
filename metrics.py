@@ -217,6 +217,11 @@ def plot_report(report, save_path, model_title):
     plt.show()
 
 
+def write_json(data, save_path):
+    with open(os.path.join(save_path, "classification.json"), "w") as f:
+        json.dump(data, f)
+
+
 def compute_metrics(df_pred: pd.DataFrame, classes: List[str],
                     y_score: np.ndarray, model_path: str):
     report, cm = compute_report(df_pred, classes)
@@ -233,8 +238,9 @@ def compute_metrics(df_pred: pd.DataFrame, classes: List[str],
     # plot classification report
     plot_report(report, save_path, model_title)
     all_metrics = {
-        "report": report, "cm": cm, "roc_auc": roc_auc,
+        "report": report, "cm": cm.tolist(), "roc_auc": roc_auc,
     }
+    write_json(all_metrics, save_path)
     return all_metrics
 
 
@@ -292,3 +298,6 @@ def main():
     y_score = np.array(all_scores)
     all_metrics = compute_metrics(df_pred, classes, y_score, model_path)
 
+
+if __name__ == "__main__":
+    main()

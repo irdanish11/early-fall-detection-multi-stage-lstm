@@ -10,13 +10,6 @@ from sklearn.metrics import (
     roc_curve,
     auc,
     RocCurveDisplay,
-    precision_recall_curve,
-    average_precision_score,
-    roc_auc_score,
-    plot_roc_curve,
-    plot_precision_recall_curve,
-    plot_confusion_matrix,
-    average_precision_score
 )
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, LabelBinarizer
 from matplotlib import pyplot as plt

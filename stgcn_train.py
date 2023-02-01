@@ -43,6 +43,7 @@ num_class = len(class_names)
 def load_dataset(data_files, batch_size, split_size=0):
     """Load data files into torch DataLoader with/without spliting train-test.
     """
+    print(f"Data file: {data_files}")
     features, labels = [], []
     for fil in data_files:
         with open(fil, 'rb') as f:

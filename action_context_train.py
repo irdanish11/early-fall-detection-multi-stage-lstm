@@ -119,7 +119,7 @@ elif args.model_type == 'context_aware':
 else:
     print("Wrong model type name!")
 
-model_weights_path = 'data/model_weights/Le2iFall/OpenPose'
+model_weights_path = 'data/model_weights'
 if not os.path.exists(model_weights_path):
     os.mkdir(model_weights_path)
     

@@ -259,5 +259,5 @@ model.fit(train_generator,
           validation_data=validation_generator,
           validation_steps=num_val_samples)
 
-model_weights_path = 'data/model_weights/Le2iFall/OpenPose'
+model_weights_path = 'data/model_weights'
 model.save_weights(f'{model_weights_path}/ms_lstm_final.h5')

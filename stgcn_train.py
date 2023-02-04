@@ -14,8 +14,7 @@ from Actionsrecognition.Models_mslstm import *
 from Visualizer import plot_graphs, plot_confusion_metrix
 
 
-# save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'
-save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)-Le2iFall-OP'
+save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'
 
 device = 'cuda:0'
 epochs = 48

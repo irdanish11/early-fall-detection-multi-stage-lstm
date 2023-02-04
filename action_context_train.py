@@ -118,15 +118,16 @@ elif args.model_type == 'context_aware':
     correct_model = True
 else:
     print("Wrong model type name!")
-    
-if not os.path.exists('data/model_weights'):
-    os.mkdir('data/model_weights')
+
+model_weights_path = 'data/model_weights/Le2iFall/OpenPose'
+if not os.path.exists(model_weights_path):
+    os.mkdir(model_weights_path)
     
 if os.path.exists(args.save_model):
     model = load_model(args.save_model)
     
 if correct_model:
-    df = pd.read_csv('data/Frames_label.csv')
+    df = pd.read_csv('data/Le2iFall/OpenPose/Frames_label.csv')
     datagen = ImageDataGenerator(
         rescale=1./255,
         featurewise_center=True,
@@ -189,8 +190,8 @@ if correct_model:
               validation_steps=validation_generator.samples // args.batch_size)
 
     if args.model_type == 'action_aware':
-        model.save_weights('data/model_weights/action_aware_vgg16_final.h5')
+        model.save_weights(f'{model_weights_path}/action_aware_vgg16_final.h5')
     else:
-        model.save_weights('data/model_weights/context_aware_vgg16_final.h5')
+        model.save_weights(f'{model_weights_path}/context_aware_vgg16_final.h5')
 
 

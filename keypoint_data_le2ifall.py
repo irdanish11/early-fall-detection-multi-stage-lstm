@@ -6,6 +6,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from sklearn.preprocessing import OneHotEncoder
 
 
 def read_json(filename):
@@ -14,7 +15,7 @@ def read_json(filename):
     return obj
 
 
-def get_keypoint(filename):
+def get_openpose_keypoint(filename):
     try:
         kp = read_json(filename)["people"][0]["pose_keypoints_2d"]
         return kp
@@ -27,7 +28,13 @@ def dump_pickle(filename, data):
         pickle.dump(data, f)
 
 
-def read_le2ifall(path: str):
+def load_pickle(filepath):
+    with open(filepath, 'rb') as f:
+        data = pickle.load(f)
+    return data
+
+
+def read_le2ifall_openpose(path: str):
     sub_dirs = ["Coffee_room", "Home"]
     dir_lst = os.listdir(path)
     key_points = {k: [] for k in sub_dirs}
@@ -40,7 +47,7 @@ def read_le2ifall(path: str):
             for v in videos:
                 files = glob(os.path.join(vid_path, v, "*.json"))
                 for f in files:
-                    data = get_keypoint(f)
+                    data = get_openpose_keypoint(f)
                     if len(data) > 0:
                         key_points[s].append(data)
                         kp_paths[s].append(f)
@@ -49,7 +56,7 @@ def read_le2ifall(path: str):
     return key_points, kp_paths
 
 
-def extract_save_labels(label_path, kp_uri, classes, data_path, k):
+def extract_save_labels(label_path, kp_uri, classes, data_path, k, filename):
     df = pd.read_csv(label_path)
     ind = []
     classes_list = []
@@ -65,21 +72,25 @@ def extract_save_labels(label_path, kp_uri, classes, data_path, k):
         frame_keys.append(f"{k}_{video_key}_{frame}.png")
         ind.append(df_temp)
     df_new = pd.concat(ind)
-    df_new.to_csv(os.path.join(data_path, label_path.split("/")[1]), index=False)
+    csv_path = os.path.join(data_path, label_path.split("/")[1])
+    df_new.to_csv(csv_path, index=False)
     df_final = pd.DataFrame({"video": frame_keys, "label": classes_list})
+    enc = OneHotEncoder(handle_unknown="ignore", sparse=False)
+    labels = enc.fit_transform(np.array(classes_list).reshape(-1, 1))
+    features = load_pickle(filename)
+    dump_pickle(filename, (features, labels))
     return df_final
 
 
-def main(path):
+def main(path, topology):
     classes = [
         'Fall Down', 'Lying Down', 'Sit Down', 'Sitting',
         'Stand Up', 'Standing', 'Walking'
     ]
-    topology = "OpenPose"
     dataset = "Le2iFall"
     data_path = os.path.join("data", dataset, topology)
     os.makedirs(data_path, exist_ok=True)
-    key_points, kp_paths = read_le2ifall(path)
+    key_points, kp_paths = read_le2ifall_openpose(os.path.join(path, topology))
     df_list = []
     for k, v in key_points.items():
         label_file = f"{k}_new.csv"
@@ -94,14 +105,16 @@ def main(path):
         dump_pickle(filename, arr)
         label_path = os.path.join("data", label_file)
         df_list.append(
-            extract_save_labels(label_path, kp_paths[k], classes, data_path, k)
+            extract_save_labels(label_path, kp_paths[k], classes,
+                                data_path, k, filename)
         )
     df = pd.concat(df_list)
     df.to_csv(os.path.join(data_path, "Frames_label.csv"), index=False)
 
 
 if __name__ == "__main__":
-    op_path = "/home/danish/Documents/mot/Le2iFall/data/open_pose"
-    main(op_path)
+    topology_path = "/home/danish/Documents/mot/Le2iFall/data"
+    topology_name = "OpenPose"
+    main(topology_path, topology_name)
 
 

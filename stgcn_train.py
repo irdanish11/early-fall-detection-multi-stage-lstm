@@ -14,7 +14,8 @@ from Actionsrecognition.Models_mslstm import *
 from Visualizer import plot_graphs, plot_confusion_metrix
 
 
-save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'
+# save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'
+save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)-Le2iFall-OP'
 
 device = 'cuda:0'
 epochs = 48
@@ -32,8 +33,8 @@ batch_size = 32
 #   channels: Inputs data (x, y and scores), Default: 3
 #   num_class: Number of pose class to train, Default: 7
 
-data_files = ['data/Coffee_room_new-set(labelXscrw)_pred.pkl',
-              'data/Home_new-set(labelXscrw)_pred.pkl']
+data_files = ['data/Le2iFall/OpenPose/Le2iFall-OpenPose-Coffee_room.pkl',
+              'data/Le2iFall/OpenPose/Le2iFall-OpenPose-Home.pkl']
 class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
                'Stand up', 'Sit down', 'Fall Down']
 class_names = sorted(class_names)

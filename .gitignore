@@ -6,3 +6,5 @@ results
 *.pptx
 *.png
 tmp.py
+*.pyc
+*.ini

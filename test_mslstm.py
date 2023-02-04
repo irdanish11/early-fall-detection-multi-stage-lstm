@@ -4,6 +4,7 @@ from tqdm import tqdm
 import pandas as pd
 import os
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 @dataclass
 class MSLSTMConfiguration:
@@ -13,7 +14,7 @@ class MSLSTMConfiguration:
     pose_backbone = 'resnet50'
     show_detected = False
     show_skeleton = False
-    device = 'cpu'
+    device = 'cuda'
 
 
 def save_bins(df_label, scenarios, fall_label='Fall Down'):
@@ -40,7 +41,8 @@ def main():
     model = "mslstm"
     topology = "AlphaPose"
     dataset = "Le2iFall"
-    base_dir = "/home/danish/Documents/mot"
+    # base_dir = "/home/danish/Documents/mot"
+    base_dir = ""
     label_file = "data/Frames_label.csv"
 
     data_dir = os.path.join(base_dir, "data")

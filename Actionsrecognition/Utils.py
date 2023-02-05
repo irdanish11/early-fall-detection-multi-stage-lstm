@@ -23,9 +23,11 @@ class Graph:
                  layout='coco_cut',
                  strategy='uniform',
                  max_hop=1,
-                 dilation=1):
+                 dilation=1,
+                 num_node=14):
         self.max_hop = max_hop
         self.dilation = dilation
+        self.num_node = num_node
 
         self.get_edge(layout)
         self.hop_dis = get_hop_distance(self.num_node, self.edge, max_hop)
@@ -33,7 +35,7 @@ class Graph:
 
     def get_edge(self, layout):
         if layout == 'coco_cut':
-            self.num_node = 14
+            # self.num_node = 14
             self_link = [(i, i) for i in range(self.num_node)]
             neighbor_link = [(6, 4), (4, 2), (2, 13), (13, 1), (5, 3), (3, 1), (12, 10),
                              (10, 8), (8, 2), (11, 9), (9, 7), (7, 1), (13, 0)]

@@ -143,7 +143,8 @@ class StreamSpatialTemporalGraph(nn.Module):
             :math:`out_channels` is number of out_channels of the last layer.
     """
     def __init__(self, in_channels, graph_args, num_class=7,
-                 edge_importance_weighting=True, **kwargs):
+                 edge_importance_weighting=True,
+                 **kwargs):
         super().__init__()
         # Load graph.
         graph = Graph(**graph_args)

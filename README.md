@@ -7,7 +7,7 @@ python create_dataset_1.py
 python create_dataset_2.py
 ```
 
-### 1.2. Train the skeleton model (pytorch environment) by running the following command in terminal:
+### 1.2. Change the value of the variable `num_node` in `stgcn_train.py` according to the topology e.g for AlphaPose value should be 14, for OpenPose values should be 18. Train the skeleton model (pytorch environment) by running the following command in terminal:
 ```bash
 python stgcn_train.py
 ```

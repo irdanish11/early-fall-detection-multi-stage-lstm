@@ -16,7 +16,7 @@ from Visualizer import plot_graphs, plot_confusion_metrix
 
 save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'
 
-device = 'cuda:0'
+device = 'cpu'
 epochs = 48
 batch_size = 32
 
@@ -97,7 +97,9 @@ if __name__ == '__main__':
     del train_loader_
 
     # MODEL.
-    graph_args = {'strategy': 'spatial'}
+    # set the following argument according to the topology AP: 14, OP: 18
+    num_node = 18
+    graph_args = {'strategy': 'spatial', "num_node": num_node}
     model = StreamSpatialTemporalGraph(in_channels=3,graph_args=graph_args, num_class=num_class,edge_importance_weighting=True).to(device)
 
     #optimizer = torch.optim.Adam(model.parameters(), lr=0.001)

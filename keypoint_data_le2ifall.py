@@ -78,6 +78,8 @@ def extract_save_labels(label_path, kp_uri, classes, data_path, k, filename):
     enc = OneHotEncoder(handle_unknown="ignore", sparse=False)
     labels = enc.fit_transform(np.array(classes_list).reshape(-1, 1))
     features = load_pickle(filename)
+    print(f"Features Shape: {features.shape}")
+    print(f"Labels Shape: {labels.shape}")
     dump_pickle(filename, (features, labels))
     return df_final
 
@@ -90,6 +92,7 @@ def main(path, topology):
     dataset = "Le2iFall"
     data_path = os.path.join("data", dataset, topology)
     os.makedirs(data_path, exist_ok=True)
+    print("Reading Data")
     key_points, kp_paths = read_le2ifall_openpose(os.path.join(path, topology))
     df_list = []
     for k, v in key_points.items():

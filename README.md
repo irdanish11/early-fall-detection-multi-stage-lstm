@@ -11,7 +11,7 @@ python create_dataset_2.py
 ```bash
 python stgcn_train.py
 ```
-### 1.3. Extract skeleton features by command:
+### 1.3. Change the value of the variable `num_node` in `skeleton_features.py` according to the topology e.g for AlphaPose value should be 14, for OpenPose values should be 18. Extract skeleton features by command:
 ```bash
 python skeleton_features.py
 ```

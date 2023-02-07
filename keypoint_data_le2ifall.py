@@ -15,12 +15,6 @@ def read_json(filename):
     return obj
 
 
-def get_openpose_keypoint(filename):
-    try:
-        kp = read_json(filename)["people"][0]["pose_keypoints_2d"]
-        return kp
-    except IndexError:
-        return []
 
 
 def dump_pickle(filename, data):
@@ -32,28 +26,6 @@ def load_pickle(filepath):
     with open(filepath, 'rb') as f:
         data = pickle.load(f)
     return data
-
-
-def read_le2ifall_openpose(path: str):
-    sub_dirs = ["Coffee_room", "Home"]
-    dir_lst = os.listdir(path)
-    key_points = {k: [] for k in sub_dirs}
-    kp_paths = deepcopy(key_points)
-    for s in sub_dirs:
-        dirs = list(filter(lambda x: s in x, dir_lst))
-        for d in dirs:
-            vid_path = os.path.join(path, d)
-            videos = os.listdir(vid_path)
-            for v in videos:
-                files = glob(os.path.join(vid_path, v, "*.json"))
-                for f in files:
-                    data = get_openpose_keypoint(f)
-                    if len(data) > 0:
-                        key_points[s].append(data)
-                        kp_paths[s].append(f)
-                    # else:
-                    #     empty_key_points[s].append(f)
-    return key_points, kp_paths
 
 
 def extract_save_labels(label_path, kp_uri, classes, data_path, k, filename):
@@ -84,6 +56,66 @@ def extract_save_labels(label_path, kp_uri, classes, data_path, k, filename):
     return df_final
 
 
+def get_openpose_keypoint(json_file):
+    files = glob(os.path.join(json_file, "*.json"))
+    points = []
+    paths = []
+    for f in files:
+        try:
+            data = read_json(f)["people"][0]["pose_keypoints_2d"]
+        except IndexError:
+            data = []
+        if len(data) > 0:
+            points.append(data)
+            frame_number = int(f.split("_")[-2]) + 1
+            paths.append(frame_number)
+    return points, paths
+
+
+def get_blazepose_keypoint(json_file):
+    data = read_json(json_file)["data"]
+    points = []
+    paths = []
+    for d in data:
+        pose = d["skeleton"][0]["pose"]
+        if len(pose) > 0:
+            points.append(pose)
+            paths.append(d["frame_index"])
+    return points, paths
+
+
+def read_le2ifall(path: str, topology: str):
+    sub_dirs = ["Coffee_room", "Home"]
+    dir_lst = os.listdir(path)
+    key_points = {k: [] for k in sub_dirs}
+    kp_paths = deepcopy(key_points)
+    for s in sub_dirs:
+        dirs = list(filter(lambda x: s in x, dir_lst))
+        for d in dirs:
+            vid_path = os.path.join(path, d)
+            videos = os.listdir(vid_path)
+            for v in videos:
+                json_file = os.path.join(vid_path, v)
+                if topology == "OpenPose":
+                    points, paths = get_openpose_keypoint(json_file)
+                elif topology == "BlazePose":
+                    points, paths = get_blazepose_keypoint(json_file)
+                else:
+                    raise NotImplementedError("Invalid Topology")
+                vid_num = v.split(".")[0]
+                key_points[s].extend(points)
+                trans_paths = list(map(lambda x: f"{s}-{vid_num}-{x}", paths))
+                kp_paths[s].extend(trans_paths)
+                # for f in files:
+                #     data = get_openpose_keypoint(f)
+                #     if len(data) > 0:
+                #         key_points[s].append(data)
+                #         kp_paths[s].append(f)
+                    # else:
+                    #     empty_key_points[s].append(f)
+    return key_points, kp_paths
+
+
 def main(path, topology):
     classes = [
         'Fall Down', 'Lying Down', 'Sit Down', 'Sitting',
@@ -93,7 +125,7 @@ def main(path, topology):
     data_path = os.path.join("data", dataset, topology)
     os.makedirs(data_path, exist_ok=True)
     print("Reading Data")
-    key_points, kp_paths = read_le2ifall_openpose(os.path.join(path, topology))
+    key_points, kp_paths = read_le2ifall(os.path.join(path, topology))
     df_list = []
     for k, v in key_points.items():
         label_file = f"{k}_new.csv"
@@ -117,7 +149,7 @@ def main(path, topology):
 
 if __name__ == "__main__":
     topology_path = "/home/danish/Documents/mot/Le2iFall/data"
-    topology_name = "OpenPose"
+    topology_name = "BlazePose"
     main(topology_path, topology_name)
 
 

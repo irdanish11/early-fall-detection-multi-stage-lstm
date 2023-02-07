@@ -14,8 +14,10 @@ import torch.nn.functional as F
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-data_files = ['data/Home_new-set(labelXscrw)_pred.pkl',
-              'data/Coffee_room_new-set(labelXscrw)_pred.pkl']
+# data_files = ['data/Home_new-set(labelXscrw)_pred.pkl',
+#               'data/Coffee_room_new-set(labelXscrw)_pred.pkl']
+data_files = ['data/Le2iFall/OpenPose/Le2iFall-OpenPose-Coffee_room.pkl',
+              'data/Le2iFall/OpenPose/Le2iFall-OpenPose-Home.pkl']
 save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'
 output_dir = 'data/skeleton_features/'
 class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
@@ -66,7 +68,8 @@ def seq_label_smoothing(labels, max_step=10):
     return labels
 
 
-graph_args = {'strategy': 'spatial'}
+num_node = 18
+graph_args = {'strategy': 'spatial', "num_node": num_node}
 model = StreamSpatialTemporalGraph(in_channels=3, graph_args=graph_args,
                                    num_class=num_class,
                                    edge_importance_weighting=True)
@@ -94,44 +97,48 @@ vid_list = df['video_name'].unique()
 
 curr_fr = 0
 for vid in vid_list:
-    print(vid)
-    vid_df = vid_frames.get_group(vid)
+    try:
+        print(vid)
+        vid_df = vid_frames.get_group(vid)
 
-    vid_fts = Features[curr_fr:curr_fr + len(vid_df)]
-    vid_lbs = Labels[curr_fr:curr_fr + len(vid_df)]
-    curr_fr = curr_fr + len(vid_df)
-    # Label Smoothing.
-    esp = 0.1
-    vid_lbs = vid_lbs * (1 - esp) + (1 - vid_lbs) * esp / (num_class - 1)
-    vid_lbs = seq_label_smoothing(vid_lbs, smooth_labels_step)
+        vid_fts = Features[curr_fr:curr_fr + len(vid_df)]
+        vid_lbs = Labels[curr_fr:curr_fr + len(vid_df)]
+        curr_fr = curr_fr + len(vid_df)
+        # Label Smoothing.
+        esp = 0.1
+        vid_lbs = vid_lbs * (1 - esp) + (1 - vid_lbs) * esp / (num_class - 1)
+        vid_lbs = seq_label_smoothing(vid_lbs, smooth_labels_step)
 
-    n = 0
-    feature = np.zeros((n_frames, 1024))
-    label = np.zeros((n_frames, num_class))
+        n = 0
+        feature = np.zeros((n_frames, 1024))
+        label = np.zeros((n_frames, num_class))
 
-    for fr in range(len(vid_df)):
-        fts = vid_fts[fr]
-        lbs = vid_lbs[fr]
+        for fr in range(len(vid_df)):
+            fts = vid_fts[fr]
+            lbs = vid_lbs[fr]
 
-        fts = torch.tensor(fts, dtype=torch.float32)
-        fts = fts.permute(2, 0, 1)[None, :]
-        out = model(fts)
-        fe = np.array(F.relu(activation['dense2']))
+            fts = torch.tensor(fts, dtype=torch.float32)
+            fts = fts.permute(2, 0, 1)[None, :]
+            out = model(fts)
+            fe = np.array(F.relu(activation['dense2']))
 
-        feature[n] = np.array(F.relu(activation['dense2']))
-        label[n] = lbs
+            feature[n] = np.array(F.relu(activation['dense2']))
+            label[n] = lbs
 
-        if n == n_frames - 1:
-            if not os.path.isdir(output_dir):
-                os.makedirs(output_dir)
-            np.save(output_dir + vid + '_feature_' + str(fr + 1) + '.npy',
-                    feature)
-            np.save(output_dir + vid + '_label_' + str(fr + 1) + '.npy', label)
-            # print('data/context_features'+'/feature_'+ str(fr) +'.npy')
-            feature = np.zeros((n_frames, 1024))
-            label = np.zeros((n_frames, num_class))
-            n = 0
+            if n == n_frames - 1:
+                if not os.path.isdir(output_dir):
+                    os.makedirs(output_dir)
+                np.save(output_dir + vid + '_feature_' + str(fr + 1) + '.npy',
+                        feature)
+                np.save(output_dir + vid + '_label_' + str(fr + 1) + '.npy', label)
+                # print('data/context_features'+'/feature_'+ str(fr) +'.npy')
+                feature = np.zeros((n_frames, 1024))
+                label = np.zeros((n_frames, num_class))
+                n = 0
 
-        else:
-            n = n + 1
+            else:
+                n = n + 1
+    except IndexError as e:
+        print("Index Error: ", e)
+
 print('Done!')

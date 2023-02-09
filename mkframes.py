@@ -2,7 +2,8 @@ import os
 
 import make_frames
 
-prefix = '/mnt/c/Users/danish/Downloads/Compressed/'
+# prefix = '/mnt/c/Users/danish/Downloads/Compressed/'
+prefix = ''
 
 input_dirs=[f'{prefix}data/Coffee_room/Videos',
             f'{prefix}data/Home/Videos']

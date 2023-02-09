@@ -7,6 +7,7 @@ from models import vgg_action, vgg_context
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, ZeroPadding2D, Conv2D, AveragePooling2D, Flatten
 from tensorflow.keras.models import Model
+from tqdm import tqdm
 
 
 parser = argparse.ArgumentParser(description='extracting context-aware features')
@@ -135,8 +136,8 @@ cols = label_onehot.columns.values
 vid_frames = df.groupby('video_name')
 vid_list = df['video_name'].unique()
 
-
-for vid in vid_list:
+print("\n\nGenerating Action Aware Features!\n\n")
+for vid in tqdm(vid_list):
     vid_df = vid_frames.get_group(vid)
     n = 0
     feature = np.zeros((args.temporal_length,1024))

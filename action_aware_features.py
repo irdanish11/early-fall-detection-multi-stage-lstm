@@ -93,7 +93,7 @@ context_aware = K.function([model_context.layers[0].input], [model_context.layer
 context_conv = K.function([model_context.layers[0].input], [model_context.layers[17].output])
 cam_conv = K.function([model_action.layers[0].input], [model_action.layers[19].output])
 cam_fc = model_action.layers[-1].get_weights()
-action_aware = K.function([model_action.layers[18].input], [model_action.layers[22].output])
+action_aware = K.function([model_action.layers[0].input], [model_action.layers[22].output])
 
 classes = ['Fall Down', 'Lying Down', 'Sit Down', 'Sitting', 'Stand Up', 'Standing', 'Walking']
 classes = sorted(classes)

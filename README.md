@@ -46,7 +46,7 @@ python make_split.py
 python ms_lstm.py --device 0
 ```
 
-### 1.9 Generate Metrics and reports for our approach
+### 1.9 Change the value of the variable `num_node` in `main_mslstm.py` according to the topology e.g for AlphaPose value should be 14, for OpenPose values should be 18. Generate Metrics and reports for our approach
 ```bash
 python test_mslstm.py
 ``` 

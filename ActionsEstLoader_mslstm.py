@@ -14,10 +14,11 @@ class TSSTG(object):
         device: (str) Device to load the model on 'cpu' or 'cuda'.
     """
     def __init__(self,
+                 num_node,
                  sk_weight_file='saved/SSTG(pts)-01(cf+hm-hm)/skfeat-model.pth',
                  lstm_weight_file='data/model_weights/ms_lstm_best.h5',
                  device='cpu'):
-        self.graph_args = {'strategy': 'spatial'}
+        self.graph_args = {'strategy': 'spatial', "num_node": num_node}
         self.class_names = sorted(['Standing', 'Walking', 'Sitting', 'Lying Down',
                             'Stand up', 'Sit down','Fall Down'])
         self.num_class = len(self.class_names)

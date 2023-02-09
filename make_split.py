@@ -8,6 +8,7 @@ Created on Sun Jan 16 12:12:36 2022
 import os
 import re
 import shutil
+from tqdm import tqdm
 
 def atoi(text):
     return int(text) if text.isdigit() else text
@@ -19,7 +20,7 @@ data_dirs = ['data/action_features/',
             'data/skeleton_features/']
 
 
-for data_dir in data_dirs:
+for data_dir in tqdm(data_dirs):
     if not os.path.exists(os.path.join(data_dir,'train')):
         os.mkdir(os.path.join(data_dir,'train'))
     if not os.path.exists(os.path.join(data_dir,'valid')):

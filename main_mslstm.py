@@ -57,7 +57,7 @@ def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
     tracker = Tracker(max_age=max_age, n_init=3)
 
     # Actions Estimate.
-    action_model = TSSTG()
+    action_model = TSSTG(num_node=18)
 
     resize_fn = ResizePadding(inp_dets, inp_dets)
 

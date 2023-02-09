@@ -21,28 +21,35 @@ python skeleton_features.py
 python mkframes.py
 ```
 
-### 1.5. Split the dataset using:
-```bash
-python make_split.py
-```
-
-### 1.6. Train action model by running the following two commands (tensorflow environment):
+### 1.5. Train action model by running the following two commands (tensorflow environment):
 ```bash
 python action_context_train.py --model-type context_aware --save-model data/model_weights/context_best.h5 --device 0
 
 python action_context_train.py --model-type action_aware --save-model data/model_weights/action_best.h5 --device 1
 ```
 
-### 1.7. Extract action-aware and context-aware features by following commands:
+### 1.6. Extract action-aware and context-aware features by following commands:
 ```bash
-python context_aware_features.py
 python action_aware_features.py
 ```
+[//]: # (python context_aware_features.py)
+
+
+### 1.7. Split the dataset using:
+```bash
+python make_split.py
+```
+
 
 ### 1.8. Train the final model by command:
 ```bash
-python ms_lstm.py -device 0
+python ms_lstm.py --device 0
 ```
+
+### 1.9 Generate Metrics and reports for our approach
+```bash
+python test_mslstm.py
+``` 
 
 ### 1.9. Now for results, set the following variables accordingly for each file:
 ```bash
@@ -56,10 +63,6 @@ and run following commands:
 For original st-gcn model results
 ```bash
 python stgcn_test.py
-``` 
-For our approach
-```bash
-python main_mslstm.py
 ``` 
 For papers approach
 ```bash

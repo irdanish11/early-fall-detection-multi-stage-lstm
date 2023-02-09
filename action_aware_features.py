@@ -5,6 +5,9 @@ import os
 import pandas as pd
 from models import vgg_action, vgg_context
 from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Input, ZeroPadding2D, Conv2D, AveragePooling2D, Flatten
+from tensorflow.keras.models import Model
+
 
 parser = argparse.ArgumentParser(description='extracting context-aware features')
 
@@ -20,7 +23,7 @@ parser.add_argument(
     type=int,
     default=7,
     help="number of classes in target dataset")
-    
+
 parser.add_argument(
     "--model-action",
     type=str,
@@ -57,6 +60,21 @@ parser.add_argument(
 args = parser.parse_args()
 
 smooth_labels_step = 8
+
+
+def get_action_aware_model(model_act):
+    inp = Input(model_act.layers[18].input_shape[1:])
+    zp1 = ZeroPadding2D((1, 1))(inp)
+    conv = Conv2D(1024, (3, 3), activation='relu')(zp1)
+    zp2 = ZeroPadding2D((1, 1))(conv)
+    ap = AveragePooling2D((14, 14), strides=(14, 14))(zp2)
+    x = Flatten()(ap)
+    model = Model(inp, x)
+    model.layers[2].set_weights(model_act.layers[19].get_weights())
+    act_aware = K.function([model.layers[0].input], [model.layers[-1].output])
+    return act_aware
+
+
 def seq_label_smoothing(labels, max_step=10):
     steps = 0
     remain_step = 0
@@ -83,6 +101,7 @@ def seq_label_smoothing(labels, max_step=10):
             active_label = np.argmax(labels[i])
     return labels
 
+
 model_action = vgg_action(args.classes, input_shape=(args.fixed_width,args.fixed_width,3))
 model_action.load_weights(args.model_action)
 
@@ -93,7 +112,13 @@ context_aware = K.function([model_context.layers[0].input], [model_context.layer
 context_conv = K.function([model_context.layers[0].input], [model_context.layers[17].output])
 cam_conv = K.function([model_action.layers[0].input], [model_action.layers[19].output])
 cam_fc = model_action.layers[-1].get_weights()
-action_aware = K.function([model_action.layers[0].input], [model_action.layers[22].output])
+# The following line raise error: ValueError: Graph disconnected: cannot obtain
+# value for tensor KerasTensor(type_spec=TensorSpec(shape=(None, 224, 224, 3),
+# dtype=tf.float32, name='input_1'), name='input_1', description="created by
+# layer 'input_1'") at layer "block1_conv1". The following previous layers were
+# accessed without issue: []
+# action_aware = K.function([model_action.layers[18].input], [model_action.layers[22].output])
+action_aware = get_action_aware_model(model_action)
 
 classes = ['Fall Down', 'Lying Down', 'Sit Down', 'Sitting', 'Stand Up', 'Standing', 'Walking']
 classes = sorted(classes)
@@ -116,7 +141,7 @@ for vid in vid_list:
     n = 0
     feature = np.zeros((args.temporal_length,1024))
     label = np.zeros((args.temporal_length,len(classes)))
-    
+
     # Label Smoothing.
     esp = 0.1
     vid_df[cols] = vid_df[cols] * (1 - esp) + (1 - vid_df[cols]) * esp / (len(cols) - 1)
@@ -130,7 +155,7 @@ for vid in vid_list:
         f2 = cv2.resize(frame, (args.fixed_width,args.fixed_width), interpolation=cv2.INTER_CUBIC)
         f2_arr = np.array(f2, dtype=np.double)
         f2_arr /= 255.0
-        
+
         in_ = np.expand_dims(f2_arr, axis=0)
 
         CONV5_out = np.array(context_conv([in_]))[0]
@@ -159,11 +184,11 @@ for vid in vid_list:
             feature = np.zeros((args.temporal_length,1024))
             label = np.zeros((args.temporal_length,len(classes)))
             n = 0
-            
+
         else:
             n = n + 1
 print('Done!')
-            
-    
-    
+
+
+
 

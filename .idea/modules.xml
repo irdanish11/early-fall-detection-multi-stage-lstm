@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../EarlyDetection-Multstage-LSTM/.idea/EarlyDetection-Multstage-LSTM.iml" filepath="$PROJECT_DIR$/../EarlyDetection-Multstage-LSTM/.idea/EarlyDetection-Multstage-LSTM.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/early-fall-detection-multi-stage-lstm.iml" filepath="$PROJECT_DIR$/.idea/early-fall-detection-multi-stage-lstm.iml" />
     </modules>
   </component>

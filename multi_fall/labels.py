@@ -220,7 +220,7 @@ label_ranges = {
 }
 
 # corresponding delay for each cam, index+1 represents tha cam number
-delays = {
+cam_delays = {
     "chute01": [3, 3, 8, 4, 23, 6, 6, 0],
     "chute02": [25, 40, 0, 16, 18, 33, 33, 0],
     "chute03": [12, 16, 8, 16, 35, 20, 20, 0],

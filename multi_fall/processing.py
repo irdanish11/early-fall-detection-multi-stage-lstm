@@ -62,7 +62,8 @@ def write_frames(video_path: str, frames_dir: str, quality: int = 94,
                  ) -> Tuple[List[str], List[int], int]:
     split = video_path.split(".")[0].split("/")
     camera, scenario = split[-1], split[-2]
-    frames_path = os.path.join(frames_dir, scenario, camera)
+    # frames_path = os.path.join(frames_dir, scenario, camera)
+    frames_path = frames_dir
     os.makedirs(frames_path, exist_ok=True)
     # capturing the video from the given path
     cap = cv2.VideoCapture(video_path)
@@ -99,9 +100,8 @@ def load_json(path: str):
 
 
 def extract_frames(path: str):
-    dataset_root = path.replace("dataset", "")
-    frames_dir = os.path.join("/run/media/danish/404/Mot/MultipleCamerasFall",
-                              'data', "MCF", "Frames")
+    dataset_root = path
+    frames_dir = os.path.join("data", "Frames")
     os.makedirs(frames_dir, exist_ok=True)
     scenarios = os.listdir(path)
     scenarios.sort()
@@ -137,5 +137,5 @@ def extract_frames(path: str):
 
 
 if __name__ == '__main__':
-    data_path = '/home/danish/Documents/mot/MultipleCamerasFall/dataset'
+    data_path = 'datasets/MultipleCameraFalls/'
     extract_frames(data_path)

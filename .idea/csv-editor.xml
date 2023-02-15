@@ -45,6 +45,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/datasets/MultipleCameraFall/Frames_label.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/results/Le2iFall/AlphaPose/CSV/Coffee_room/Coffee_room_mslstm_video(1).csv">
           <value>
             <Attribute>

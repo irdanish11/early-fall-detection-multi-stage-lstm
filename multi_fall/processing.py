@@ -52,7 +52,9 @@ def make_labels(frame_stats, frames, frame_numbers):
         "frame_labels": frame_labels_dict
     }
     df = pd.DataFrame({
-        "video": frame_names, "frame_number": frame_indexes, "label": frame_labels
+        "video": frame_names,
+        "frame_number": frame_indexes,
+        "label": frame_labels
     })
     return df, json_data
 

@@ -32,10 +32,29 @@ batch_size = 32
 #   channels: Inputs data (x, y and scores), Default: 3
 #   num_class: Number of pose class to train, Default: 7
 
-data_files = ['data/Le2iFall/OpenPose/Le2iFall-OpenPose-Coffee_room.pkl',
-              'data/Le2iFall/OpenPose/Le2iFall-OpenPose-Home.pkl']
-class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-               'Stand up', 'Sit down', 'Fall Down']
+dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
+topology = "AlphaPose"
+if dataset == 'Le2iFall':
+    class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
+                   'Stand up', 'Sit down', 'Fall Down']
+    data_files = [
+        f'data/{dataset}/{topology}/{dataset}-{topology}-Coffee_room.pkl',
+        f'data/{dataset}/{topology}/{dataset}-{topology}-Home.pkl'
+    ]
+elif dataset == 'MultipleCameraFall':
+    class_names = [
+        "Moving horizontally", "Walking, standing up", "Falling",
+        "Lying on the ground", "Crounching", "Moving down", "Moving up",
+        "Sitting", "Lying on a sofa"
+    ]
+    data_files = [
+        f'data/{dataset}/{topology}/{dataset}-{topology}.pkl',
+    ]
+elif dataset == 'UR':
+    class_names = []
+    raise NotImplementedError("UR dataset not implemented yet!")
+else:
+    raise ValueError("Dataset not found!")
 class_names = sorted(class_names)
 num_class = len(class_names)
 

@@ -120,6 +120,7 @@ if __name__ == '__main__':
         del train_loader_
     else:
         train_loader, valid_loader = load_dataset(data_files[0:1], batch_size, 0.2)
+        dataloader = {'train': train_loader, 'valid': valid_loader}
 
 
     # MODEL.

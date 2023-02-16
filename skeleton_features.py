@@ -16,12 +16,33 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # data_files = ['data/Home_new-set(labelXscrw)_pred.pkl',
 #               'data/Coffee_room_new-set(labelXscrw)_pred.pkl']
-data_files = ['data/Le2iFall/OpenPose/Le2iFall-OpenPose-Coffee_room.pkl',
-              'data/Le2iFall/OpenPose/Le2iFall-OpenPose-Home.pkl']
+dataset = 'UR' # 'Le2iFall', 'MultipleCameraFall' or 'UR
+topology = "AlphaPose"
+if dataset == 'Le2iFall':
+    class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
+                   'Stand up', 'Sit down', 'Fall Down']
+    data_files = [
+        f'data/{dataset}/{topology}/{dataset}-{topology}-Coffee_room.pkl',
+        f'data/{dataset}/{topology}/{dataset}-{topology}-Home.pkl'
+    ]
+elif dataset == 'MultipleCameraFall':
+    class_names = [
+        "Moving horizontally", "Walking, standing up", "Falling",
+        "Lying on the ground", "Crounching", "Moving down", "Moving up",
+        "Sitting", "Lying on a sofa"
+    ]
+    data_files = [
+        f'data/{dataset}/{topology}/{dataset}-{topology}.pkl',
+    ]
+elif dataset == 'UR':
+    class_names = ["Fall", "Lying", "Not Lying"]
+    data_files = [
+        f'data/{dataset}/{topology}/{dataset}-{topology}.pkl',
+    ]
+else:
+    raise ValueError("Dataset not found!")
 save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'
 output_dir = 'data/skeleton_features/'
-class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-               'Stand up', 'Sit down', 'Fall Down']
 class_names = sorted(class_names)
 num_class = len(class_names)
 Features, Labels = [], []
@@ -68,7 +89,7 @@ def seq_label_smoothing(labels, max_step=10):
     return labels
 
 
-num_node = 18
+num_node = 14
 graph_args = {'strategy': 'spatial', "num_node": num_node}
 model = StreamSpatialTemporalGraph(in_channels=3, graph_args=graph_args,
                                    num_class=num_class,

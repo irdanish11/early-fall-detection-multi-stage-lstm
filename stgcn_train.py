@@ -32,7 +32,7 @@ batch_size = 32
 #   channels: Inputs data (x, y and scores), Default: 3
 #   num_class: Number of pose class to train, Default: 7
 
-dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
+dataset = 'UR' # 'Le2iFall', 'MultipleCameraFall' or 'UR
 topology = "AlphaPose"
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
@@ -51,8 +51,10 @@ elif dataset == 'MultipleCameraFall':
         f'data/{dataset}/{topology}/{dataset}-{topology}.pkl',
     ]
 elif dataset == 'UR':
-    class_names = []
-    raise NotImplementedError("UR dataset not implemented yet!")
+    class_names = ["Fall", "Lying", "Not Lying"]
+    data_files = [
+        f'data/{dataset}/{topology}/{dataset}-{topology}.pkl',
+    ]
 else:
     raise ValueError("Dataset not found!")
 class_names = sorted(class_names)
@@ -117,7 +119,7 @@ if __name__ == '__main__':
 
     # MODEL.
     # set the following argument according to the topology AP: 14, OP: 18
-    num_node = 18
+    num_node = 14
     graph_args = {'strategy': 'spatial', "num_node": num_node}
     model = StreamSpatialTemporalGraph(in_channels=3,graph_args=graph_args, num_class=num_class,edge_importance_weighting=True).to(device)
 

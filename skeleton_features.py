@@ -16,7 +16,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # data_files = ['data/Home_new-set(labelXscrw)_pred.pkl',
 #               'data/Coffee_room_new-set(labelXscrw)_pred.pkl']
-dataset = 'UR' # 'Le2iFall', 'MultipleCameraFall' or 'UR
+dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
 topology = "AlphaPose"
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
@@ -110,9 +110,17 @@ def get_activation(name):
 model.dense2.register_forward_hook(get_activation('dense2'))
 
 df = pd.read_csv(frames_csv)
-df['video_name'] = df['video'].str.split('_')
-df['video_name'] = df['video_name'].str[:-1]
-df['video_name'] = df['video_name'].str.join('_')
+if dataset == 'Le2iFall':
+    df['video_name'] = df['video'].str.split('_')
+    df['video_name'] = df['video_name'].str[:-1]
+    df['video_name'] = df['video_name'].str.join('_')
+elif dataset == 'MultipleCameraFall':
+    df['video_name'] = df['video'].str.split('-')
+    df['video_name'] = df['video_name'].str[:-1]
+    df['video_name'] = df['video_name'].str.join('-')
+elif dataset == 'UR':
+    df['video_name'] = df['video']
+
 
 vid_frames = df.groupby('video_name')
 vid_list = df['video_name'].unique()

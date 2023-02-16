@@ -45,6 +45,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/data/MultipleCameraFall/AlphaPose/Frames_label.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/data/UR/AlphaPose/Frames_label.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/datasets/MultipleCameraFall/Frames_label.csv">
           <value>
             <Attribute>

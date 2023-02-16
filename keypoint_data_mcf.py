@@ -70,7 +70,8 @@ def main(path, topology, dataset):
     print(f"Saved {pickle_path} and {csv_path}")
     print(f"Features shape: {features.shape}")
     print(f"Labels shape: {labels.shape}")
-    print(f"Keypoint Data extracted for: {dataset} dataset {topology} topology")
+    print(f"Keypoint Data extracted for: {dataset} dataset & ",
+          f"{topology} topology")
 
 
 if __name__ == '__main__':

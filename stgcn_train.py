@@ -104,6 +104,7 @@ def set_training(model, mode=True):
 
 
 if __name__ == '__main__':
+    print(f"STGCN Training on {dataset} dataset, topology {topology}.")
     save_folder = os.path.join(os.path.dirname(__file__), save_folder)
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)

@@ -110,13 +110,17 @@ if __name__ == '__main__':
         os.makedirs(save_folder)
 
     # DATA.
-    train_loader, _ = load_dataset(data_files[0:1], batch_size)
-    valid_loader, train_loader_ = load_dataset(data_files[1:2], batch_size, 0.2)
+    if dataset == "Le2iFall":
+        train_loader, _ = load_dataset(data_files[0:1], batch_size, 0.2)
+        valid_loader, train_loader_ = load_dataset(data_files[1:2], batch_size, 0.2)
 
-    train_loader = data.DataLoader(data.ConcatDataset([train_loader.dataset, train_loader_.dataset]),
-                                   batch_size, shuffle=True)
-    dataloader = {'train': train_loader, 'valid': valid_loader}
-    del train_loader_
+        train_loader = data.DataLoader(data.ConcatDataset([train_loader.dataset, train_loader_.dataset]),
+                                       batch_size, shuffle=True)
+        dataloader = {'train': train_loader, 'valid': valid_loader}
+        del train_loader_
+    else:
+        train_loader, valid_loader = load_dataset(data_files[0:1], batch_size, 0.2)
+
 
     # MODEL.
     # set the following argument according to the topology AP: 14, OP: 18

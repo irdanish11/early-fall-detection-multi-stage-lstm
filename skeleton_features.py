@@ -16,7 +16,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # data_files = ['data/Home_new-set(labelXscrw)_pred.pkl',
 #               'data/Coffee_room_new-set(labelXscrw)_pred.pkl']
-dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
+dataset = 'UR' # 'Le2iFall', 'MultipleCameraFall' or 'UR
 topology = "AlphaPose"
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
@@ -89,7 +89,7 @@ def seq_label_smoothing(labels, max_step=10):
             active_label = np.argmax(labels[i])
     return labels
 
-
+print("Loading model...")
 num_node = 14
 graph_args = {'strategy': 'spatial', "num_node": num_node}
 model = StreamSpatialTemporalGraph(in_channels=3, graph_args=graph_args,
@@ -126,6 +126,7 @@ vid_frames = df.groupby('video_name')
 vid_list = df['video_name'].unique()
 
 curr_fr = 0
+print("Extracting features...")
 for vid in vid_list:
     try:
         print(vid)

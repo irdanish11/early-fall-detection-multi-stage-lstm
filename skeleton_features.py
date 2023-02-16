@@ -18,6 +18,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 #               'data/Coffee_room_new-set(labelXscrw)_pred.pkl']
 dataset = 'UR' # 'Le2iFall', 'MultipleCameraFall' or 'UR
 topology = "AlphaPose"
+frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
                    'Stand up', 'Sit down', 'Fall Down']
@@ -108,7 +109,7 @@ def get_activation(name):
 
 model.dense2.register_forward_hook(get_activation('dense2'))
 
-df = pd.read_csv('data/Frames_label.csv')
+df = pd.read_csv(frames_csv)
 df['video_name'] = df['video'].str.split('_')
 df['video_name'] = df['video_name'].str[:-1]
 df['video_name'] = df['video_name'].str.join('_')

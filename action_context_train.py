@@ -127,7 +127,7 @@ if os.path.exists(args.save_model):
     model = load_model(args.save_model)
     
 if correct_model:
-    df = pd.read_csv('data/Le2iFall/OpenPose/Frames_label.csv')
+    df = pd.read_csv('data/UR/AlphaPose/Frames_label.csv')
     datagen = ImageDataGenerator(
         rescale=1./255,
         featurewise_center=True,

@@ -19,7 +19,8 @@ def get_alphapose_keypoint(json_path, df_labels):
     r = "_keypoints.json"
     for f in keypoint_files:
         data = read_json(f)
-        split = f.split("/")[-1].replace(r, "").split("-")
+        frame_name = f.split("/")[-1].replace(r, ".png")
+        split = frame_name.replace(".png", "").split("-")
         seq_name = "-".join(split[:2])
         frame_id = int(split[-1])
         kp_data = data["people"][0]["pose_keypoints_2d"]
@@ -34,7 +35,7 @@ def get_alphapose_keypoint(json_path, df_labels):
                     keypoints.append(kp_data.flatten().tolist())
                 else:
                     keypoints.append(kp_data)
-                names.append(seq_name)
+                names.append(frame_name)
                 labels.append(classes[label])
                 frame_ids.append(frame_id)
             except TypeError:

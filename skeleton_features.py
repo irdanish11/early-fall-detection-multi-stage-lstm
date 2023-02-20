@@ -119,7 +119,9 @@ elif dataset == 'MultipleCameraFall':
     df['video_name'] = df['video_name'].str[:-1]
     df['video_name'] = df['video_name'].str.join('-')
 elif dataset == 'UR':
-    df['video_name'] = df['video']
+    df['video_name'] = df['video'].str.split('-')
+    df['video_name'] = df['video_name'].str[:3]
+    df['video_name'] = df['video_name'].str.join('-')
 
 
 vid_frames = df.groupby('video_name')

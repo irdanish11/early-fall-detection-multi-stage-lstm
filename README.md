@@ -21,7 +21,7 @@ python skeleton_features.py
 python mkframes.py
 ```
 
-### 1.5. Train action model by running the following two commands (tensorflow environment):
+### 1.5. Train action model by running the following two commands (change --classes argument according to the number of classes in your dataset)
 ```bash
 python action_context_train.py --model-type context_aware --save-model data/model_weights/context_best.h5 --device 0
 

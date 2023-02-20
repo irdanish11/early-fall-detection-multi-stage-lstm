@@ -9,6 +9,20 @@ from tensorflow.keras.layers import Input, ZeroPadding2D, Conv2D, AveragePooling
 from tensorflow.keras.models import Model
 from tqdm import tqdm
 
+dataset = 'UR'
+if dataset == 'Le2iFall':
+    class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
+                   'Stand up', 'Sit down', 'Fall Down']
+elif dataset == 'MultipleCameraFall':
+    class_names = [
+        "Moving horizontally", "Walking, standing up", "Falling",
+        "Lying on the ground", "Crounching", "Moving down", "Moving up",
+        "Sitting", "Lying on a sofa"
+    ]
+elif dataset == 'UR':
+    class_names = ["Fall", "Lying", "Not Lying"]
+else:
+    raise ValueError("Dataset not found!")
 
 parser = argparse.ArgumentParser(description='extracting context-aware features')
 
@@ -22,7 +36,7 @@ parser.add_argument(
 parser.add_argument(
     "--classes",
     type=int,
-    default=7,
+    default=len(class_names),
     help="number of classes in target dataset")
 
 parser.add_argument(
@@ -121,13 +135,21 @@ cam_fc = model_action.layers[-1].get_weights()
 # action_aware = K.function([model_action.layers[18].input], [model_action.layers[22].output])
 action_aware = get_action_aware_model(model_action)
 
-classes = ['Fall Down', 'Lying Down', 'Sit Down', 'Sitting', 'Stand Up', 'Standing', 'Walking']
-classes = sorted(classes)
+classes = sorted(class_names)
 
 df = pd.read_csv('data/Frames_label.csv')
-df['video_name']=df['video'].str.split('_')
-df['video_name']=df['video_name'].str[:-1]
-df['video_name']=df['video_name'].str.join('_')
+if dataset == 'Le2iFall':
+    df['video_name'] = df['video'].str.split('_')
+    df['video_name'] = df['video_name'].str[:-1]
+    df['video_name'] = df['video_name'].str.join('_')
+elif dataset == 'MultipleCameraFall':
+    df['video_name'] = df['video'].str.split('-')
+    df['video_name'] = df['video_name'].str[:-1]
+    df['video_name'] = df['video_name'].str.join('-')
+elif dataset == 'UR':
+    df['video_name'] = df['video'].str.split('-')
+    df['video_name'] = df['video_name'].str[:3]
+    df['video_name'] = df['video_name'].str.join('-')
 
 label_onehot = pd.get_dummies(df['label'])
 df = df.join(label_onehot)

@@ -10,6 +10,8 @@ from tensorflow.keras.models import Model
 from tqdm import tqdm
 
 dataset = 'UR'
+topology = "AlphaPose"
+frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
                    'Stand up', 'Sit down', 'Fall Down']
@@ -137,7 +139,7 @@ action_aware = get_action_aware_model(model_action)
 
 classes = sorted(class_names)
 
-df = pd.read_csv('data/Frames_label.csv')
+df = pd.read_csv(frames_csv)
 if dataset == 'Le2iFall':
     df['video_name'] = df['video'].str.split('_')
     df['video_name'] = df['video_name'].str[:-1]

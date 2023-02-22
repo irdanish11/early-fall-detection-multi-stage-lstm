@@ -26,7 +26,6 @@ def get_alphapose_keypoint(json_path, frame_data, s, c):
         keypoints, names, labels, frame_ids = [], [], [], []
     df = pd.DataFrame({
         "video": names,
-        "frame_number": frame_ids,
         "label": labels
     })
     return df, keypoints

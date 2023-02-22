@@ -30,7 +30,8 @@ def kpt2bbox(kpt, ex=20):
                      kpt[:, 0].max() + ex, kpt[:, 1].max() + ex))
 
 
-def test_vid(args, save_out: str, label_out_csv: str, actual_fall_frame: int):
+def test_vid_le2ifall(args, save_out: str, label_out_csv: str,
+                      actual_fall_frame: int):
     def preproc(img):
         """preprocess function for CameraLoader.
         """

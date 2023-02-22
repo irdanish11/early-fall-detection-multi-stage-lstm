@@ -1,10 +1,11 @@
 from dataclasses import dataclass
-from main_mslstm import test_vid
+from main_mslstm import test_vid_le2ifall
 from tqdm import tqdm
 import pandas as pd
 import os
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
 
 @dataclass
 class MSLSTMConfiguration:
@@ -37,14 +38,10 @@ def save_bins(df_label, scenarios, fall_label='Fall Down'):
     return buckets, fall_start
 
 
-def main():
-    model = "mslstm"
-    topology = "AlphaPose"
-    dataset = "Le2iFall"
+def test_le2i_fall(dataset, topology, model):
+    label_file = "data/Frames_label.csv"
     # base_dir = "/home/danish/Documents/mot"
     base_dir = ""
-    label_file = "data/Frames_label.csv"
-
     data_dir = os.path.join(base_dir, "data")
     vid_out_dir = os.path.join(base_dir, "results", dataset, topology, "Videos")
     label_out_dir = os.path.join("results", dataset, topology, "CSV")
@@ -80,8 +77,19 @@ def main():
             if video_file in fall_start_scenario:
                 actual_fall_frame = fall_start_scenario[video_file]
             args = MSLSTMConfiguration(camera=source)
-            test_vid(args, save_out, label_out_csv, actual_fall_frame)
+            test_vid_le2ifall(args, save_out, label_out_csv, actual_fall_frame)
             print("================================")
+
+
+def test_ur(dataset, topology, model):
+    label_file = os.path.join("data", dataset, topology, "Frames_label.csv")
+
+
+def main():
+    model = "mslstm"
+    topology = "AlphaPose"
+    dataset = "Le2iFall"
+
 
 
 if __name__ == '__main__':

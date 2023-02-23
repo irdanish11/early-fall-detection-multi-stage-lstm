@@ -202,18 +202,19 @@ def test_vid_ur(args, label_file, label_out_dir):
                     act_fts_arr = np.array(act_fts)
                     out = action_model.predict(pts, act_fts_arr,
                                                frame.shape[:2])
-                    action_name = action_model.class_names[out.argmax()]
-                    # print(f"Action Name: {action_name}", end='')
-                    action = '{}: {:.2f}%'.format(action_name, out.max() * 100)
-                    if action_name == 'Fall Down':
-                        clr = (255, 0, 0)
-                        if not fall_detected:
-                            pred_fall_frame = f
-                            diff = pred_fall_frame - actual_fall_frame
-                            anticipation_time = diff / 24.0
-                            fall_detected = True
-                    elif action_name == 'Lying Down':
-                        clr = (255, 200, 0)
+                    if act_fts_arr.shape[1] == 30:
+                        action_name = action_model.class_names[out.argmax()]
+                        print(f"Action Name: {action_name}", end='')
+                        action = '{}: {:.2f}%'.format(action_name, out.max() * 100)
+                        if action_name == 'Fall Down':
+                            clr = (255, 0, 0)
+                            if not fall_detected:
+                                pred_fall_frame = f
+                                diff = pred_fall_frame - actual_fall_frame
+                                anticipation_time = diff / 24.0
+                                fall_detected = True
+                        elif action_name == 'Lying Down':
+                            clr = (255, 200, 0)
 
         json_data = {"scores": pred_scores, "classes": action_model.class_names}
         frames_label['mslstm_pred_label'] = pred_label

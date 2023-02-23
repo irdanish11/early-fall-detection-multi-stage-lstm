@@ -116,7 +116,7 @@ def test_vid_ur(args, label_file, label_out_dir):
     for vid in vid_list:
         label_out_csv = os.path.join(label_out_dir, vid + '.csv')
         print("Processing video: ", vid)
-        frames_label = vid_frames.get_group(vid)
+        frames_label = vid_frames.get_group(vid).reset_index()
         fall_df = frames_label[frames_label['label'] == fall_label]
         frame_name = fall_df['video'].tolist()[0]
         actual_fall_frame = int(frame_name.split('-')[-1].split('.')[0])
@@ -132,7 +132,7 @@ def test_vid_ur(args, label_file, label_out_dir):
             image = frame.copy()
             f = i + 1
             if f > total_frames:
-                print("Video {} is done".format(vid))
+                print(f"Video {vid} is done, Frame: {f}, Total Frames {total_frames}")
                 break
             # Detect humans bbox in the frame with detector model.
             detected = detect_model.detect(frame, need_resize=True,

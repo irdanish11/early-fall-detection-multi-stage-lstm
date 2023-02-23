@@ -30,6 +30,207 @@ def kpt2bbox(kpt, ex=20):
                      kpt[:, 0].max() + ex, kpt[:, 1].max() + ex))
 
 
+def build_models(args, class_names, num_node=14):
+    print('Building models...')
+    # DETECTION MODEL.
+    inp_dets = args.detection_input_size
+    # inp_dets = detection_input_size
+    detect_model = TinyYOLOv3_onecls(inp_dets, device=args.device)
+    # POSE MODEL.
+    inp_pose = args.pose_input_size.split('x')
+    inp_pose = (int(inp_pose[0]), int(inp_pose[1]))
+    pose_model = SPPE_FastPose(args.pose_backbone, inp_pose[0], inp_pose[1],
+                               device=args.device)
+    # Actions Estimate.
+    action_model = TSSTG(num_node=num_node, class_names=class_names)
+    resize_fn = ResizePadding(inp_dets, inp_dets)
+    action_features = ActionFeatures(
+        context_weight_file='data/model_weights/context_best.h5',
+        action_weight_file='data/model_weights/action_best.h5',
+        num_class=len(class_names))
+    print('Model Building and Loading Done.')
+    return detect_model, pose_model, action_model, resize_fn, action_features
+
+
+def group_video_df(df, dataset):
+    if dataset == 'Le2iFall':
+        df['video_name'] = df['video'].str.split('_')
+        df['video_name'] = df['video_name'].str[:-1]
+        df['video_name'] = df['video_name'].str.join('_')
+    elif dataset == 'MultipleCameraFall':
+        df['video_name'] = df['video'].str.split('-')
+        df['video_name'] = df['video_name'].str[:-1]
+        df['video_name'] = df['video_name'].str.join('-')
+    elif dataset == 'UR':
+        df['video_name'] = df['video'].str.split('-')
+        df['video_name'] = df['video_name'].str[:3]
+        df['video_name'] = df['video_name'].str.join('-')
+
+    vid_frames = df.groupby('video_name')
+    vid_list = df['video_name'].unique()
+    return vid_list, vid_frames
+
+
+def data_topology_info(dataset, topology):
+    classes = {
+        "Le2iFall": ['Standing', 'Walking', 'Sitting', 'Lying Down',
+                     'Stand up', 'Sit down', 'Fall Down'],
+        "MultipleCameraFall": [
+            "Moving horizontally", "Walking, standing up", "Falling",
+            "Lying on the ground", "Crounching", "Moving down", "Moving up",
+            "Sitting", "Lying on a sofa"
+        ],
+        "UR": ["Fall", "Lying", "Not Lying"]
+    }
+    keypoints_num = {
+        "AlphaPose": 14,
+        "OpenPose": 18,
+        # "BlazePose": 24,
+    }
+    class_names = classes[dataset]
+    num_node = keypoints_num[topology]
+    fall_aliases = {
+        "Le2iFall": "Fall Down", "MultipleCameraFall": "Falling", "UR": "Fall"
+    }
+    lying_aliases = {
+        "Le2iFall": "Lying Down", "MultipleCameraFall": "Lying on the ground",
+        "UR": "Lying"
+    }
+    fall_label = fall_aliases[dataset]
+    lying_label = lying_aliases[dataset]
+    return class_names, num_node, fall_label, lying_label
+
+
+def test_vid_ur(args, label_file, label_out_dir):
+    df = pd.read_csv(label_file)
+    params = data_topology_info(args.dataset, args.topology)
+    class_names, num_node, fall_label, lying_label = params
+    vid_list, vid_frames = group_video_df(df, args.dataset)
+    device = args.device
+
+    models = build_models(args, class_names, num_node)
+    detect_model, pose_model, action_model, resize_fn, action_features = models
+    max_age = 30
+    tracker = Tracker(max_age=max_age, n_init=3)
+
+    for vid in vid_list:
+        label_out_csv = os.path.join(label_out_dir, vid + '.csv')
+        print("Processing video: ", vid)
+        frames_label = vid_frames.get_group(vid)
+        fall_df = frames_label[frames_label['label'] == fall_label]
+        frame_name = fall_df['video'].tolist()[0]
+        actual_fall_frame = int(frame_name.split('-')[-1].split('.')[0])
+        fps_time = 0
+        f = 0
+        act_fts = []
+        pred_label = [''] * len(frames_label)
+        pred_scores = [''] * len(frames_label)
+        fall_detected = False
+        total_frames = len(frames_label)
+        for i, row in df.iterrows():
+            frame = cv2.imread(os.path.join("data/Frames", row["video"]))
+            image = frame.copy()
+            f = i + 1
+            # Detect humans bbox in the frame with detector model.
+            detected = detect_model.detect(frame, need_resize=True,
+                                           expand_bb=10)
+            # Predict each tracks bbox of current frame from previous frames
+            # information with Kalman filter.
+            tracker.predict()
+            # Merge two source of predicted bbox together.
+            for track in tracker.tracks:
+                det = torch.tensor([track.to_tlbr().tolist() + [0.5, 1.0, 0.0]],
+                                   dtype=torch.float32)
+                detected = torch.cat([detected, det],
+                                     dim=0) if detected is not None else det
+            detections = []  # List of Detections object for tracking.
+            if detected is not None:
+                # detected = non_max_suppression(detected[None, :], 0.45,
+                # 0.2)[0] Predict skeleton pose of each bboxs.
+                poses = pose_model.predict(frame, detected[:, 0:4],
+                                           detected[:, 4])
+
+                # Create Detections object.
+                detections = [Detection(kpt2bbox(ps['keypoints'].numpy()),
+                                        np.concatenate((ps['keypoints'].numpy(),
+                                                        ps['kp_score'].numpy()),
+                                                       axis=1),
+                                        ps['kp_score'].mean().numpy()) for ps in
+                              poses]
+                if not act_fts:
+                    feature = action_features.get_action_features(image)
+                    act_fts.append(feature)
+
+                # VISUALIZE.
+                if args.show_detected:
+                    for bb in detected[:, 0:5]:
+                        frame = cv2.rectangle(frame, (bb[0], bb[1]),
+                                              (bb[2], bb[3]),
+                                              (0, 0, 255), 1)
+
+            # Update tracks by matching each track information of current and
+            # previous frame or
+            # create a new track if no matched.
+            tracker.update(detections)
+
+            # Predict Actions of each track.
+            print(f"Tracks: {len(tracker.tracks)}, Frames: {f}/{total_frames}",
+                  end="\r")
+            for i, track in enumerate(tracker.tracks):
+                if not track.is_confirmed():
+                    continue
+                track_id = track.track_id
+                bbox = track.to_tlbr().astype(int)
+                center = track.get_center().astype(int)
+
+                feature = action_features.get_action_features(image)
+                act_fts.append(feature)
+                if len(act_fts) > 30:
+                    act_fts = act_fts[1:]
+
+                action = 'pending..'
+                action_name = action
+                out = []
+                clr = (0, 255, 0)
+                # Use 30 frames time-steps to prediction.
+
+                if len(track.keypoints_list) == 30:
+                    pts = np.array(track.keypoints_list, dtype=np.float32)
+                    act_fts_arr = np.array(act_fts)
+                    out = action_model.predict(pts, act_fts_arr,
+                                               frame.shape[:2])
+                    action_name = action_model.class_names[out.argmax()]
+                    # print(f"Action Name: {action_name}", end='')
+                    action = '{}: {:.2f}%'.format(action_name, out.max() * 100)
+                    if action_name == 'Fall Down':
+                        clr = (255, 0, 0)
+                        if not fall_detected:
+                            pred_fall_frame = f
+                            diff = pred_fall_frame - actual_fall_frame
+                            anticipation_time = diff / 24.0
+                            fall_detected = True
+                    elif action_name == 'Lying Down':
+                        clr = (255, 200, 0)
+
+        json_data = {"scores": pred_scores, "classes": action_model.class_names}
+        frames_label['mslstm_pred_label'] = pred_label
+        pred_time = [''] * len(pred_label)
+        frames_label['mslstm_pred_time'] = pred_time
+        try:
+            frames_label.loc[pred_fall_frame - 1, 'mslstm_pred_time'] = str(
+                anticipation_time) + 's'
+        except:
+            pass
+        os.makedirs('results', exist_ok=True)
+        json_path = label_out_csv.replace(".csv", ".json")
+        with open(json_path, 'w') as f:
+            json.dump(json_data, f)
+        if os.path.exists(label_out_csv):
+            frames_label.to_csv(label_out_csv, mode='w+', index=False)
+        else:
+            frames_label.to_csv(label_out_csv, mode='w', index=False)
+
+
 def test_vid_le2ifall(args, save_out: str, label_out_csv: str,
                       actual_fall_frame: int):
     def preproc(img):

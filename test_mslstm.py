@@ -1,5 +1,5 @@
+from main_mslstm import test_vid_le2ifall, test_vid_ur
 from dataclasses import dataclass
-from main_mslstm import test_vid_le2ifall
 from tqdm import tqdm
 import pandas as pd
 import os
@@ -62,7 +62,7 @@ def test_le2i_fall(dataset, topology, model):
         print("\n\nStarting Video Test\n\n")
         for i, vid in enumerate(videos):
             print("\n\n================================")
-            print(f"Videos: {i+1}/{len(videos)}")
+            print(f"Videos: {i + 1}/{len(videos)}")
             source = os.path.join(vid_path, vid)
             ext = vid.split('.')[-1]
             vid_name = vid.split('.')[0].replace(" ", "")
@@ -81,15 +81,24 @@ def test_le2i_fall(dataset, topology, model):
             print("================================")
 
 
-def test_ur(dataset, topology, model):
+def test_ur(dataset, topology):
     label_file = os.path.join("data", dataset, topology, "Frames_label.csv")
+    label_out_dir = os.path.join("results", dataset, topology, "CSV")
+    os.makedirs(label_out_dir, exist_ok=True)
+    args = MSLSTMConfiguration(camera="")
+    args.dataset = dataset
+    args.topology = topology
+    test_vid_ur(args, label_file, label_out_dir)
 
 
 def main():
     model = "mslstm"
     topology = "AlphaPose"
-    dataset = "Le2iFall"
-
+    dataset = "UR"
+    if dataset == "Le2iFall":
+        test_le2i_fall(dataset, topology, model)
+    elif dataset == "UR":
+        test_ur(dataset, topology)
 
 
 if __name__ == '__main__':

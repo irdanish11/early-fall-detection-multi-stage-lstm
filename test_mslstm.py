@@ -92,6 +92,7 @@ def test_ur(dataset, topology):
 
 
 def main():
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     model = "mslstm"
     topology = "AlphaPose"
     dataset = "UR"

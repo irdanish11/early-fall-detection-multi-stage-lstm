@@ -127,7 +127,7 @@ def test_vid_ur(args, label_file, label_out_dir):
         pred_scores = [''] * len(frames_label)
         fall_detected = False
         total_frames = len(frames_label)
-        for i, row in df.iterrows():
+        for i, row in frames_label.iterrows():
             frame = cv2.imread(os.path.join("data/Frames", row["video"]))
             image = frame.copy()
             f = i + 1

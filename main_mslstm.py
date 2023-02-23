@@ -131,6 +131,9 @@ def test_vid_ur(args, label_file, label_out_dir):
             frame = cv2.imread(os.path.join("data/Frames", row["video"]))
             image = frame.copy()
             f = i + 1
+            if f > total_frames:
+                print("Video {} is done".format(vid))
+                break
             # Detect humans bbox in the frame with detector model.
             detected = detect_model.detect(frame, need_resize=True,
                                            expand_bb=10)

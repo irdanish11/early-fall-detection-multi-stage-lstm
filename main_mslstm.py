@@ -20,6 +20,8 @@ from ActionsEstLoader_mslstm import TSSTG
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
+torch.cuda.set_device(1)
+
 
 def kpt2bbox(kpt, ex=20):
     """Get bbox that hold on all the keypoints (x,y)

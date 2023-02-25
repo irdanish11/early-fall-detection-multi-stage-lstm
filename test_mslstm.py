@@ -15,7 +15,7 @@ class MSLSTMConfiguration:
     pose_backbone = 'resnet50'
     show_detected = False
     show_skeleton = False
-    device = 'cuda'
+    device = 'cpu'
 
 
 def save_bins(df_label, scenarios, fall_label='Fall Down'):

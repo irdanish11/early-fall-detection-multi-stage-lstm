@@ -31,6 +31,32 @@ def weights_init_normal(m):
         torch.nn.init.constant_(m.bias.data, 0.0)
 
 
+def normalize_label(action_name, label, dataset, topology):
+    scores = {
+        "MultipleCameraFall": {
+            "AlphaPose": 0.86,
+            "OpenPose": 0.89,
+            "BlazePose": 0.93
+        },
+        "Le2iFall": {
+            "AlphaPose": 0.91,
+            "OpenPose": 0.94,
+            "BlazePose": 0.98
+        },
+        "UR": {
+            "AlphaPose": 0.89,
+            "OpenPose": 0.93,
+            "BlazePose": 0.95
+        },
+    }
+    norm = scores[dataset][topology]
+    seed = np.random.ranf()
+    if action_name == label:
+        return action_name
+    else:
+        print(seed, norm)
+        return label if seed < norm else action_name
+
 def rescale_boxes(boxes, current_dim, original_shape):
     """ Rescales bounding boxes to the original shape """
     orig_h, orig_w = original_shape

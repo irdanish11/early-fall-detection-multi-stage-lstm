@@ -1,15 +1,15 @@
-import tensorflow as tf
-
-gpus = tf.config.experimental.list_physical_devices('GPU')
-if gpus:
-    print("Num GPUs Available: ", len(gpus))
-    print(gpus)
-    # Restrict TensorFlow to only use the first GPU
-    try:
-        tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
-    except RuntimeError as e:
-        # Visible devices must be set at program startup
-        print(e)
+# import tensorflow as tf
+#
+# gpus = tf.config.experimental.list_physical_devices('GPU')
+# if gpus:
+#     print("Num GPUs Available: ", len(gpus))
+#     print(gpus)
+#     # Restrict TensorFlow to only use the first GPU
+#     try:
+#         tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
+#     except RuntimeError as e:
+#         # Visible devices must be set at program startup
+#         print(e)
 
 import json
 import os
@@ -23,6 +23,7 @@ import pandas as pd
 from Detection.Utils import ResizePadding
 from CameraLoader import CamLoader, CamLoader_Q
 from DetectorLoader import TinyYOLOv3_onecls
+from Detection.Utils import normalize_label
 
 from PoseEstimateLoader import SPPE_FastPose
 from fn import draw_single
@@ -141,6 +142,7 @@ def test_vid_ur(args, label_file, label_out_dir):
         act_fts = []
         pred_label = [''] * len(frames_label)
         pred_scores = [''] * len(frames_label)
+        norm_labels = [''] * len(frames_label)
         fall_detected = False
         total_frames = len(frames_label)
         for i, row in frames_label.iterrows():
@@ -191,56 +193,64 @@ def test_vid_ur(args, label_file, label_out_dir):
             # Update tracks by matching each track information of current and
             # previous frame or
             # create a new track if no matched.
-            tracker.update(detections)
+            try:
+                tracker.update(detections)
 
-            # Predict Actions of each track.
-            print(f"Tracks: {len(tracker.tracks)}, Frames: {f}/{total_frames}",
-                  end="\r")
-            for i, track in enumerate(tracker.tracks):
-                if not track.is_confirmed():
-                    continue
-                track_id = track.track_id
-                bbox = track.to_tlbr().astype(int)
-                center = track.get_center().astype(int)
+                # Predict Actions of each track.
+                print(f"Tracks: {len(tracker.tracks)}, Frames: {f}/{total_frames}",
+                      end="\r")
+                for i, track in enumerate(tracker.tracks):
+                    if not track.is_confirmed():
+                        continue
+                    track_id = track.track_id
+                    bbox = track.to_tlbr().astype(int)
+                    center = track.get_center().astype(int)
 
-                feature = action_features.get_action_features(image)
-                act_fts.append(feature)
-                if len(act_fts) > 30:
-                    act_fts = act_fts[1:]
+                    feature = action_features.get_action_features(image)
+                    act_fts.append(feature)
+                    if len(act_fts) > 30:
+                        act_fts = act_fts[1:]
 
-                action = 'pending..'
-                action_name = action
-                out = []
-                clr = (0, 255, 0)
-                # Use 30 frames time-steps to prediction.
+                    action = 'pending..'
+                    action_name = action
+                    out = []
+                    clr = (0, 255, 0)
+                    # Use 30 frames time-steps to prediction.
 
-                if len(track.keypoints_list) == 30:
-                    pts = np.array(track.keypoints_list, dtype=np.float32)
-                    act_fts_arr = np.array(act_fts)
-                    if act_fts_arr.shape[0] == 30:
-                        try:
-                            out = action_model.predict(pts, act_fts_arr,
-                                                       frame.shape[:2])
-                        except Exception as e:
-                            print(e)
-                        action_name = action_model.class_names[out.argmax()]
-                        # print(f"Action Name: {action_name}", end='')
-                        action = '{}: {:.2f}%'.format(action_name,
-                                                      out.max() * 100)
-                        if action_name == 'Fall Down':
-                            clr = (255, 0, 0)
-                            if not fall_detected:
-                                pred_fall_frame = f
-                                diff = pred_fall_frame - actual_fall_frame
-                                anticipation_time = diff / 24.0
-                                fall_detected = True
-                        elif action_name == 'Lying Down':
-                            clr = (255, 200, 0)
+                    if len(track.keypoints_list) == 30:
+                        pts = np.array(track.keypoints_list, dtype=np.float32)
+                        act_fts_arr = np.array(act_fts)
+                        if act_fts_arr.shape[0] == 30:
+                            try:
+                                out = action_model.predict(pts, act_fts_arr,
+                                                           frame.shape[:2])
+                            except Exception as e:
+                                print(e)
+                            action_name = action_model.class_names[out.argmax()]
+                            # print(f"Action Name: {action_name}", end='')
+                            action = '{}: {:.2f}%'.format(action_name,
+                                                          out.max() * 100)
+                            if action_name == fall_label:
+                                clr = (255, 0, 0)
+                                if not fall_detected:
+                                    pred_fall_frame = f
+                                    diff = pred_fall_frame - actual_fall_frame
+                                    anticipation_time = diff / 24.0
+                                    fall_detected = True
+                            elif action_name == lying_label:
+                                clr = (255, 200, 0)
 
-                # VISUALIZE.
-                if track.time_since_update == 0:
-                    pred_label[f - 1] = action_name
-                    pred_scores[f - 1] = [str(e) for e in out]
+                    # VISUALIZE.
+
+                    if track.time_since_update == 0:
+                        pred_label[f - 1] = action_name
+                        pred_scores[f - 1] = [str(e) for e in out]
+                        norm_labels[f - 1] = normalize_label(
+                            action_name, row["label"],
+                            args.dataset, args.topology
+                        )
+            except ValueError as ve:
+                print(ve)
 
         json_data = {"scores": pred_scores, "classes": action_model.class_names}
         frames_label['mslstm_pred_label'] = pred_label

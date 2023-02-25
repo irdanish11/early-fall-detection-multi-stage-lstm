@@ -207,7 +207,7 @@ def test_vid_ur(args, label_file, label_out_dir):
                         except Exception as e:
                             print(e)
                         action_name = action_model.class_names[out.argmax()]
-                        print(f"Action Name: {action_name}", end='')
+                        # print(f"Action Name: {action_name}", end='')
                         action = '{}: {:.2f}%'.format(action_name, out.max() * 100)
                         if action_name == 'Fall Down':
                             clr = (255, 0, 0)

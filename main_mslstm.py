@@ -200,9 +200,12 @@ def test_vid_ur(args, label_file, label_out_dir):
                 if len(track.keypoints_list) == 30:
                     pts = np.array(track.keypoints_list, dtype=np.float32)
                     act_fts_arr = np.array(act_fts)
-                    if act_fts_arr.shape[1] == 30:
-                        out = action_model.predict(pts, act_fts_arr,
-                                                   frame.shape[:2])
+                    if act_fts_arr.shape[0] == 30:
+                        try:
+                            out = action_model.predict(pts, act_fts_arr,
+                                                       frame.shape[:2])
+                        except Exception as e:
+                            print(e)
                         action_name = action_model.class_names[out.argmax()]
                         print(f"Action Name: {action_name}", end='')
                         action = '{}: {:.2f}%'.format(action_name, out.max() * 100)

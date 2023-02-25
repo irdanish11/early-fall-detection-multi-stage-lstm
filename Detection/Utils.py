@@ -54,7 +54,6 @@ def normalize_label(action_name, label, dataset, topology):
     if action_name == label:
         return action_name
     else:
-        print(seed, norm)
         return label if seed < norm else action_name
 
 def rescale_boxes(boxes, current_dim, original_shape):

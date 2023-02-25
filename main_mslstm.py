@@ -1,3 +1,16 @@
+import tensorflow as tf
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    print("Num GPUs Available: ", len(gpus))
+    print(gpus)
+    # Restrict TensorFlow to only use the first GPU
+    try:
+        tf.config.experimental.set_visible_devices(gpus[1], 'GPU')
+    except RuntimeError as e:
+        # Visible devices must be set at program startup
+        print(e)
+
 import json
 import os
 import cv2
@@ -20,7 +33,8 @@ from ActionsEstLoader_mslstm import TSSTG
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-torch.cuda.set_device(1)
+
+# torch.cuda.device(1)
 
 
 def kpt2bbox(kpt, ex=20):
@@ -134,7 +148,8 @@ def test_vid_ur(args, label_file, label_out_dir):
             image = frame.copy()
             f = i + 1
             if f > total_frames:
-                print(f"Video {vid} is done, Frame: {f}, Total Frames {total_frames}")
+                print(
+                    f"Video {vid} is done, Frame: {f}, Total Frames {total_frames}")
                 break
             # Detect humans bbox in the frame with detector model.
             detected = detect_model.detect(frame, need_resize=True,
@@ -210,7 +225,8 @@ def test_vid_ur(args, label_file, label_out_dir):
                             print(e)
                         action_name = action_model.class_names[out.argmax()]
                         # print(f"Action Name: {action_name}", end='')
-                        action = '{}: {:.2f}%'.format(action_name, out.max() * 100)
+                        action = '{}: {:.2f}%'.format(action_name,
+                                                      out.max() * 100)
                         if action_name == 'Fall Down':
                             clr = (255, 0, 0)
                             if not fall_detected:
@@ -220,7 +236,6 @@ def test_vid_ur(args, label_file, label_out_dir):
                                 fall_detected = True
                         elif action_name == 'Lying Down':
                             clr = (255, 200, 0)
-
 
                 # VISUALIZE.
                 if track.time_since_update == 0:
@@ -404,8 +419,8 @@ def test_vid_le2ifall(args, save_out: str, label_out_csv: str,
                     if not fall_detected:
                         pred_fall_frame = f
                         anticipation_time = (
-                            pred_fall_frame - actual_fall_frame
-                        ) / 24.0
+                                                    pred_fall_frame - actual_fall_frame
+                                            ) / 24.0
                         fall_detected = True
                 elif action_name == 'Lying Down':
                     clr = (255, 200, 0)
@@ -434,7 +449,7 @@ def test_vid_le2ifall(args, save_out: str, label_out_csv: str,
         if fall_detected:
             frame = cv2.putText(frame,
                                 'Fall Detected Frame: %d, Fall Anticipation Time: %fs' % (
-                                pred_fall_frame, anticipation_time),
+                                    pred_fall_frame, anticipation_time),
                                 (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                                 (0, 255, 0), 1)
         frame = frame[:, :, ::-1]

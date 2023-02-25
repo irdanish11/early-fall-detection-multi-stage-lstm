@@ -96,7 +96,7 @@ class EmptyLayer(nn.Module):
 
 class YOLOLayer(nn.Module):
     """Detection layer"""
-    def __init__(self, anchors, num_classes, img_dim=416):
+    def __init__(self, anchors, num_classes, img_dim=416, device="cpu"):
         super(YOLOLayer, self).__init__()
         self.anchors = anchors
         self.num_anchors = len(anchors)
@@ -109,6 +109,8 @@ class YOLOLayer(nn.Module):
         self.metrics = {}
         self.img_dim = img_dim
         self.grid_size = 0  # grid size
+        self.device = device
+
 
     def compute_grid_offsets(self, grid_size, cuda=True):
         self.grid_size = grid_size

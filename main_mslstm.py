@@ -216,6 +216,12 @@ def test_vid_ur(args, label_file, label_out_dir):
                         elif action_name == 'Lying Down':
                             clr = (255, 200, 0)
 
+
+                # VISUALIZE.
+                if track.time_since_update == 0:
+                    pred_label[f - 1] = action_name
+                    pred_scores[f - 1] = [str(e) for e in out]
+
         json_data = {"scores": pred_scores, "classes": action_model.class_names}
         frames_label['mslstm_pred_label'] = pred_label
         pred_time = [''] * len(pred_label)

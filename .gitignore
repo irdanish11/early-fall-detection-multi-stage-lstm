@@ -10,3 +10,4 @@ tmp.py
 *.pyc
 *.ini
 datasets
+AlphaPoseExtract/caffe_pose_mpi_models/

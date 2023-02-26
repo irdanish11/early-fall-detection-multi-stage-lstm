@@ -256,6 +256,7 @@ def test_vid_ur(args, label_file, label_out_dir):
         frames_label['mslstm_pred_label'] = pred_label
         pred_time = [''] * len(pred_label)
         frames_label['mslstm_pred_time'] = pred_time
+        frames_label["normalized_label"] = norm_labels
         try:
             frames_label.loc[pred_fall_frame - 1, 'mslstm_pred_time'] = str(
                 anticipation_time) + 's'

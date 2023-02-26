@@ -16,6 +16,7 @@ class MSLSTMConfiguration:
     show_detected = False
     show_skeleton = False
     device = 'cpu'
+    lstm_weight_file = 'data/model_weights/ms_lstm_best.h5'
 
 
 def save_bins(df_label, scenarios, fall_label='Fall Down'):

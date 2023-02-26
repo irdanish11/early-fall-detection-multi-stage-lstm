@@ -45,9 +45,9 @@ python make_split.py
 ```
 
 
-### 1.8. Train the final model by command:
+### 1.8. Train the final model by command (change the number of classes accordingly):
 ```bash
-python ms_lstm.py --device 0
+python ms_lstm.py --device 0 --classes 7
 ```
 
 ### 1.9 Change the value of the variable `num_node` in `main_mslstm.py` according to the topology e.g for AlphaPose value should be 14, for OpenPose values should be 18. Generate Metrics and reports for our approach

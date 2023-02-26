@@ -3,10 +3,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 import json
-from tqdm import tqdm
 from glob import glob
 from multiprocessing import cpu_count, Pool
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import time
 
 dataset = "MultipleCameraFall"
@@ -123,12 +121,6 @@ def pool_handler(img_list):
         lambda x: (x[0], x[1], len(img_list)), enumerate(img_list)
     ))
     p.map(extract_ap_skeleton, img_args)
-
-
-def mp(func, args, workers):
-    with ProcessPoolExecutor(workers) as ex:
-        res = ex.map(func, args)
-    return list(res)
 
 
 if __name__ == "__main__":

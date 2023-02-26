@@ -55,7 +55,7 @@ else:
 
 no_decimals = 6
 
-
+image_list = sorted(image_list)
 for pi, image_path in enumerate(image_list):
 
     print(f'Processing Image {pi + 1}/{len(image_list)}', end="\r")

@@ -33,7 +33,7 @@ def weights_init_normal(m):
 
 def normalize_label(action_name, label, dataset, topology):
     scores = {
-        "MultipleCameraFall": {
+        "UR": {
             "AlphaPose": 0.86,
             "OpenPose": 0.89,
             "BlazePose": 0.93
@@ -43,7 +43,7 @@ def normalize_label(action_name, label, dataset, topology):
             "OpenPose": 0.94,
             "BlazePose": 0.98
         },
-        "UR": {
+        "MultipleCameraFall": {
             "AlphaPose": 0.89,
             "OpenPose": 0.93,
             "BlazePose": 0.95

@@ -14,6 +14,7 @@ from sklearn.metrics import (
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, LabelBinarizer
 from matplotlib import pyplot as plt
 import numpy as np
+from glob import glob
 import scipy
 
 
@@ -243,6 +244,20 @@ def read_json(filename):
     return data
 
 
+def csv_file_list(dataset, label_out_dir):
+    if dataset == "Le2iFall":
+        scenarios = ["Coffee_room", "Home"]
+        classes = ["Fall Down", "Lying Down", "Not Fall"]
+        keep_classes = classes[:2]
+        csv_files = []
+        for scenario in scenarios:
+            results_dir = os.path.join(label_out_dir, scenario)
+            scenario_files = glob(os.path.join(results_dir, "*.csv"))
+            csv_files.extend(scenario_files)
+    elif dataset == "UR":
+        classes = ["Fall", "Lying", "Not Lying"]
+
+
 def main():
     model = "mslstm"
     topology = "AlphaPose"
@@ -252,19 +267,11 @@ def main():
     model_path = os.path.join(dataset, topology)
 
     label_out_dir = os.path.join("results", dataset, topology, "CSV")
-    scenarios = ["Coffee_room", "Home"]
-    classes = ["Fall Down", "Lying Down", "Not Fall"]
-    keep_classes = classes[:2]
     df_pred = pd.DataFrame()
     all_scores = []
-    for scenario in scenarios:
-        results_dir = os.path.join(label_out_dir, scenario)
-        results = os.listdir(results_dir)
-        results = list(filter(lambda x: x.endswith(".csv"), results))
         i = 0
         for i, result in enumerate(results):
             print(f"Scenario: {scenario} - {i+1}/{len(results)}", end="\r")
-            file_path = os.path.join(results_dir, result)
             df = pd.read_csv(file_path)
             scores = read_json(file_path.replace("csv", "json"))
             pred_scores = list(filter(lambda x: len(x) != 0, scores["scores"]))

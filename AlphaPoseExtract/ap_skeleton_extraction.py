@@ -5,6 +5,9 @@ import numpy as np
 import json
 from tqdm import tqdm
 from glob import glob
+from multiprocessing import cpu_count, Pool
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import time
 
 dataset = "MultipleCameraFall"
 prefixes = {
@@ -21,44 +24,36 @@ weightsFile = os.path.join(root, weights_file_label)
 
 # Specify the paths for the output json files
 output_root = f'../datasets/{dataset}/Topologies/{prefixes[dataset]}_dataset_ap_json'
+# output_root = "/run/media/danish/404/Mot/UR/datasets/UR/tmp/Topologies"
 
 if not os.path.exists(output_root):
     os.makedirs(str(output_root))
-
-# Specify the input image dimensions
-inWidth = 320
-inHeight = 240
-
 # Read the network into Memory
 net = cv2.dnn.readNetFromCaffe(protoFile, weightsFile)
-
-
 # rgb_root = '/scratch/uceemsd/z_mm/fall_datasets/Le2i/Le2i_FallDataset_rgb'
 if dataset == "MultipleCameraFall":
     rgb_root = "../datasets/MultipleCameraFall/Frames"
+    # rgb_root = "/run/media/danish/404/Mot/UR/datasets/UR/fall-01-cam0-rgb"
     image_list = glob(os.path.join(rgb_root, "*.png"))
-    # scenarios = os.listdir(rgb_root)
-    # video_list = []
-    # for s in scenarios:
-    #     scenario_path = os.path.join(rgb_root, s)
-    #     if os.path.isdir(scenario_path):
-    #         video_list.extend(glob(os.path.join(scenario_path, "*.avi")))
-
+    image_list = sorted(image_list)
 elif dataset == "UR":
     rgb_root = '/scratch/uceemsd/z_mm/fall_datasets/rzeszow/rzeszow_dataset_rgb'
     video_list = sorted([x for x in Path(rgb_root).iterdir()])
     image_list = []
     for vi, video in enumerate(video_list):
         image_list.extend([img for img in video.iterdir()])
+    image_list = sorted(image_list)
 else:
     raise NotImplementedError(f"{dataset} not implemented yet")
 
-no_decimals = 6
 
-image_list = sorted(image_list)
-for pi, image_path in enumerate(image_list):
-
-    print(f'Processing Image {pi + 1}/{len(image_list)}', end="\r")
+def extract_ap_skeleton(args):
+    pi, image_path, num_samples = args
+    no_decimals = 6
+    # Specify the input image dimensions
+    inWidth = 320
+    inHeight = 240
+    print(f'Processing Image {pi + 1}/{num_samples}')
 
     frame = cv2.imread(str(image_path))
 
@@ -111,3 +106,36 @@ for pi, image_path in enumerate(image_list):
 
     with open(json_path, 'w') as json_file:
         json.dump(output_dict, json_file)
+
+
+def single_process(img_list):
+    print("Using Single Process")
+    for pi, image_path in enumerate(img_list):
+        extract_ap_skeleton((pi, image_path, len(img_list)))
+
+
+def pool_handler(img_list):
+    print("Using Multiprocessing")
+    processors = cpu_count()
+    print("Number of cpu : ", processors)
+    p = Pool(processors)
+    img_args = list(map(
+        lambda x: (x[0], x[1], len(img_list)), enumerate(img_list)
+    ))
+    p.map(extract_ap_skeleton, img_args)
+
+
+def mp(func, args, workers):
+    with ProcessPoolExecutor(workers) as ex:
+        res = ex.map(func, args)
+    return list(res)
+
+
+if __name__ == "__main__":
+    multi = True
+    start = time.time()
+    if multi:
+        pool_handler(image_list)
+    else:
+        single_process(image_list)
+    print(f"Total time: {time.time() - start}")

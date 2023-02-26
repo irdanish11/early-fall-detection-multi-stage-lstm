@@ -42,6 +42,14 @@ elif dataset == 'UR':
     ]
 else:
     raise ValueError("Dataset not found!")
+if topology == "AlphaPose":
+    num_node = 14
+elif topology == "OpenPose":
+    num_node = 18
+elif topology == "BlazePose":
+    num_node = 21
+else:
+    raise ValueError("Wrong Topology")
 save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'
 output_dir = 'data/skeleton_features/'
 class_names = sorted(class_names)

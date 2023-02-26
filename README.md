@@ -3,15 +3,19 @@
 ### 1.1. First of all, create skeleton dataset from videos by following two commands (you can also skip this option because the output of this step is already present in ‘data’ folder):
 
 ```bash
-python extract_video_frames.py
 python create_dataset_2.py
 ```
 
-### 1.2. Change the value of the variable `num_node` in `stgcn_train.py` according to the topology e.g for AlphaPose value should be 14, for OpenPose values should be 18. Train the skeleton model (pytorch environment) by running the following command in terminal:
+```shell
+# For MultipleCameraFall
+python extract_video_frames.py
+```
+
+### 1.2. Change the value of the variable `dataset` and `topology` in `stgcn_train.py` according to you needs. Train the skeleton model (pytorch environment) by running the following command in terminal:
 ```bash
 python stgcn_train.py
 ```
-### 1.3. Change the value of the variable `num_node` in `skeleton_features.py` according to the topology e.g for AlphaPose value should be 14, for OpenPose values should be 18. Extract skeleton features by command:
+### 1.3. Change the value of the variable `dataset` and `topology` in `stgcn_train.py` according to you needs. Extract skeleton features by command:
 ```bash
 python skeleton_features.py
 ```

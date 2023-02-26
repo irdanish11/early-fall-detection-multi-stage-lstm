@@ -57,6 +57,14 @@ elif dataset == 'UR':
     ]
 else:
     raise ValueError("Dataset not found!")
+if topology == "AlphaPose":
+    num_node = 14
+elif topology == "OpenPose":
+    num_node = 18
+elif topology == "BlazePose":
+    num_node = 21
+else:
+    raise ValueError("Wrong Topology")
 class_names = sorted(class_names)
 num_class = len(class_names)
 
@@ -125,7 +133,6 @@ if __name__ == '__main__':
 
     # MODEL.
     # set the following argument according to the topology AP: 14, OP: 18
-    num_node = 14
     graph_args = {'strategy': 'spatial', "num_node": num_node}
     model = StreamSpatialTemporalGraph(in_channels=3,graph_args=graph_args, num_class=num_class,edge_importance_weighting=True).to(device)
 

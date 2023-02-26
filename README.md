@@ -3,7 +3,7 @@
 ### 1.1. First of all, create skeleton dataset from videos by following two commands (you can also skip this option because the output of this step is already present in ‘data’ folder):
 
 ```bash
-python create_dataset_1.py
+python extract_video_frames.py
 python create_dataset_2.py
 ```
 

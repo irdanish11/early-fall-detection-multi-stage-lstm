@@ -101,8 +101,8 @@ def load_json(path: str):
     return data
 
 
-def extract_frames(path: str):
-    dataset_root = path
+def extract_frames(dataset_root, path: str):
+    # dataset_root = path
     frames_dir = os.path.join("data", "Frames")
     os.makedirs(frames_dir, exist_ok=True)
     scenarios = os.listdir(path)

@@ -248,53 +248,60 @@ def csv_file_list(dataset, label_out_dir):
     if dataset == "Le2iFall":
         scenarios = ["Coffee_room", "Home"]
         classes = ["Fall Down", "Lying Down", "Not Fall"]
-        keep_classes = classes[:2]
         csv_files = []
         for scenario in scenarios:
             results_dir = os.path.join(label_out_dir, scenario)
             scenario_files = glob(os.path.join(results_dir, "*.csv"))
             csv_files.extend(scenario_files)
     elif dataset == "UR":
-        classes = ["Fall", "Lying", "Not Lying"]
+        classes = ["Fall", "Lying", "Not Fall"]
+        csv_files = glob(os.path.join(label_out_dir, "*.csv"))
+    elif dataset == "MultipleCameraFall":
+        classes = ["Falling", "Lying on the ground", "Not Fall"]
+        csv_files = []
+    else:
+        raise ValueError("Invalid Dataset Name")
+    return csv_files, classes
 
 
 def main():
     model = "mslstm"
     topology = "AlphaPose"
-    dataset = "Le2iFall"
+    dataset = "UR" # "Le2iFall"
     # base_dir = "/home/danish/Documents/mot"
-    base_dir = ""
+    pred_key = "mslstm_pred_label"
     model_path = os.path.join(dataset, topology)
-
     label_out_dir = os.path.join("results", dataset, topology, "CSV")
+    csv_files, classes = csv_file_list(dataset, label_out_dir)
+    keep_classes = classes[:2]
     df_pred = pd.DataFrame()
     all_scores = []
-        i = 0
-        for i, result in enumerate(results):
-            print(f"Scenario: {scenario} - {i+1}/{len(results)}", end="\r")
-            df = pd.read_csv(file_path)
-            scores = read_json(file_path.replace("csv", "json"))
-            pred_scores = list(filter(lambda x: len(x) != 0, scores["scores"]))
-            predictions = []
-            for p in pred_scores:
-                pred = list(map(float, p))
-                predictions.append([*pred[:2], sum(pred[2:])])
-            all_scores.extend(predictions)
-            df = df.dropna(subset=["mslstm_pred_label"])
-            df = df[df.mslstm_pred_label != "pending.."]
-            values = list({*df.label.unique(), *df.mslstm_pred_label.unique()})
-            # replacing other classes with "Not Fall"
-            for value in values:
-                if value not in keep_classes:
-                    df.label.replace(value, "Not Fall", inplace=True)
-                    df.mslstm_pred_label.replace(
-                        value, "Not Fall", inplace=True
-                    )
-            df_pred = pd.concat(
-                [df_pred, df[["label", "mslstm_pred_label"]]],
-                ignore_index=True
-            )
-        print(f"Scenario: {scenario} - {i+1}/{len(results)}")
+    i = 0
+    for i, file_path in enumerate(csv_files):
+        print(f"Processing file {i+1}/{len(csv_files)}", end="\r")
+        df = pd.read_csv(file_path)
+        scores = read_json(file_path.replace("csv", "json"))
+        pred_scores = list(filter(lambda x: len(x) != 0, scores["scores"]))
+        predictions = []
+        for p in pred_scores:
+            pred = list(map(float, p))
+            predictions.append([*pred[:2], sum(pred[2:])])
+        all_scores.extend(predictions)
+        df = df.dropna(subset=[pred_key])
+        df = df[df.mslstm_pred_label != "pending.."]
+        values = list({*df.label.unique(), *df[pred_key].unique()})
+        # replacing other classes with "Not Fall"
+        for value in values:
+            if value not in keep_classes:
+                df.label.replace(value, "Not Fall", inplace=True)
+                df[pred_key].replace(
+                    value, "Not Fall", inplace=True
+                )
+        df_pred = pd.concat(
+            [df_pred, df[["label", pred_key]]],
+            ignore_index=True
+        )
+    print(f"{i+1}/{len(csv_files)}")
     y_score = np.array(all_scores)
     all_metrics = compute_metrics(df_pred, classes, y_score, model_path)
 

@@ -20,7 +20,7 @@ protoFile = os.path.join(root, protofile_label)
 weightsFile = os.path.join(root, weights_file_label)
 
 # Specify the paths for the output json files
-output_root = f'../datasets/{dataset}/{prefixes[dataset]}_dataset_ap_json'
+output_root = f'../datasets/{dataset}/Topologies/{prefixes[dataset]}_dataset_ap_json'
 
 if not os.path.exists(output_root):
     os.makedirs(str(output_root))
@@ -56,9 +56,9 @@ else:
 no_decimals = 6
 
 
-for pi, image_path in tqdm(enumerate(image_list)):
+for pi, image_path in enumerate(image_list):
 
-    print(f'Processing Image {pi + 1}/{len(image_list)}')
+    print(f'Processing Image {pi + 1}/{len(image_list)}', end="\r")
 
     frame = cv2.imread(str(image_path))
 

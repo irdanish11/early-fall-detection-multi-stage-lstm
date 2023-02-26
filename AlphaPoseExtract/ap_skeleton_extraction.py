@@ -56,9 +56,9 @@ else:
 no_decimals = 6
 
 
-for pi, image_path in enumerate(image_list):
+for pi, image_path in tqdm(enumerate(image_list)):
 
-    print(f'Processing Image {pi}/{len(image_list)}')
+    print(f'Processing Image {pi + 1}/{len(image_list)}')
 
     frame = cv2.imread(str(image_path))
 
@@ -96,14 +96,14 @@ for pi, image_path in enumerate(image_list):
 
     #OpenPose output format
     output_dict = {"people" : [{"pose_keypoints_2d": keypoints_list}]}
-
-    json_root_path = os.path.join(output_root, video.stem)
+    split = image_path.replace(".png", "").split("/")[-1].split("-")
+    json_root_path = os.path.join(output_root, split[0], split[1])
 
     if not os.path.exists(json_root_path):
         os.makedirs(str(json_root_path))
 
-    image_no = image_path.split('/')[-1].replace(".png", "")
-    video_no = '-'.join(image_path.split('-')[:3])
+    image_no = split[-1]
+    video_no = '-'.join(split[:2])
 
     json_file_name = f'{video_no}-rgb-{image_no}_keypoints.json'
 

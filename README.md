@@ -20,19 +20,19 @@ python stgcn_train.py
 python skeleton_features.py
 ```
 
-### 1.4. For training the multistage LSTM model, first convert the videos into frames by following command:
+### 1.4. For training the multistage LSTM model, first convert the videos into frames by following command (Skip this if you have frames):
 ```bash
 python mkframes.py
 ```
 
-### 1.5. Train action model by running the following two commands (change --classes argument according to the number of classes in your dataset)
+### 1.5. Change the `dataset` and `topology` accordingly. Train action model by running the following two commands 
 ```bash
 python action_context_train.py --model-type context_aware --save-model data/model_weights/context_best.h5 --device 0
 
 python action_context_train.py --model-type action_aware --save-model data/model_weights/action_best.h5 --device 1
 ```
 
-### 1.6. Extract action-aware and context-aware features by following commands:
+### 1.6. Change the `dataset` and `topology` accordingly. Extract action-aware and context-aware features by following commands:
 ```bash
 python action_aware_features.py
 ```

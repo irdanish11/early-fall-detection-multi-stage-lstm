@@ -159,10 +159,12 @@ cols = label_onehot.columns.values
 
 vid_frames = df.groupby('video_name')
 vid_list = df['video_name'].unique()
-
+labels_dir = "data/csv_labels"
+os.makedirs(labels_dir, exist_ok=True)
 print("\n\nGenerating Action Aware Features!\n\n")
 for vid in tqdm(vid_list):
     vid_df = vid_frames.get_group(vid)
+    # df_tmp = vid_df.copy()
     n = 0
     feature = np.zeros((args.temporal_length,1024))
     label = np.zeros((args.temporal_length,len(classes)))
@@ -176,7 +178,7 @@ for vid in tqdm(vid_list):
         frame = cv2.imread(os.path.join(args.data_dir,vid_df.iloc[fr,0]))
         frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
         cls = vid_df.iloc[fr,1]
-        cls_label = vid_df.iloc[fr,3:10]
+        cls_label = vid_df.iloc[fr,3:3+len(classes)]
         f2 = cv2.resize(frame, (args.fixed_width,args.fixed_width), interpolation=cv2.INTER_CUBIC)
         f2_arr = np.array(f2, dtype=np.double)
         f2_arr /= 255.0
@@ -203,8 +205,10 @@ for vid in tqdm(vid_list):
         if n==args.temporal_length-1:
             if not os.path.isdir(args.output):
                 os.makedirs(args.output)
+            df_tmp = vid_df[fr+1-n:fr+1].loc[:,["video", "label"]].reset_index(drop=True)
             np.save('data/action_features/'+vid+'_feature_'+ str(fr+1) +'.npy', feature)
             np.save('data/action_features/'+vid+'_label_'+ str(fr+1) + '.npy', label)
+            df_tmp.to_csv(os.path.join(labels_dir, vid + '_csvlabel_' + str(fr+1) + '.csv'), index=False)
             # print('data/context_features'+'/feature_'+ str(fr) +'.npy')
             feature = np.zeros((args.temporal_length,1024))
             label = np.zeros((args.temporal_length,len(classes)))

@@ -1,10 +1,11 @@
 from main_mslstm import test_vid_le2ifall, test_vid_ur
+from mslstm_inference import inference
 from dataclasses import dataclass
 from tqdm import tqdm
 import pandas as pd
 import os
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 
 @dataclass
@@ -17,6 +18,23 @@ class MSLSTMConfiguration:
     show_skeleton = False
     device = 'cpu'
     lstm_weight_file = 'data/model_weights/ms_lstm_best.h5'
+
+
+def get_classes_list(dataset):
+    if dataset == 'Le2iFall':
+        class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
+                    'Stand up', 'Sit down', 'Fall Down']
+    elif dataset == 'MultipleCameraFall':
+        class_names = [
+            "Moving horizontally", "Walking, standing up", "Falling",
+            "Lying on the ground", "Crounching", "Moving down", "Moving up",
+            "Sitting", "Lying on a sofa"
+        ]
+    elif dataset == 'UR':
+        class_names = ["Fall", "Lying", "Not Lying"]
+    else:
+        raise ValueError("Dataset not found!")
+    return sorted(class_names)
 
 
 def save_bins(df_label, scenarios, fall_label='Fall Down'):
@@ -86,22 +104,35 @@ def test_ur(dataset, topology):
     label_file = os.path.join("data", dataset, topology, "Frames_label.csv")
     label_out_dir = os.path.join("results", dataset, topology, "CSV")
     os.makedirs(label_out_dir, exist_ok=True)
-    args = MSLSTMConfiguration(camera="")
+    args = MSLSTMConfiguration()
     args.dataset = dataset
     args.topology = topology
     test_vid_ur(args, label_file, label_out_dir)
 
 
-def main():
+def run_inference(dataset, topology):
+    args = MSLSTMConfiguration("")
+    args.dataset = dataset
+    args.topology = topology
+    class_names = get_classes_list(args.dataset)
+    args.class_names = class_names
+    args.num_class = len(class_names)
+    inference(args)
+
+
+def main(new: bool = True):
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     model = "mslstm"
     topology = "AlphaPose"
     dataset = "UR"
-    if dataset == "Le2iFall":
-        test_le2i_fall(dataset, topology, model)
-    elif dataset == "UR":
-        test_ur(dataset, topology)
+    if new:
+        run_inference(dataset, topology)
+    else:
+        if dataset == "Le2iFall":
+            test_le2i_fall(dataset, topology, model)
+        elif dataset == "UR":
+            test_ur(dataset, topology)
 
 
 if __name__ == '__main__':
-    main()
+    main(new=True)

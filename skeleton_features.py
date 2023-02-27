@@ -98,7 +98,6 @@ def seq_label_smoothing(labels, max_step=10):
     return labels
 
 print("Loading model...")
-num_node = 14
 graph_args = {'strategy': 'spatial', "num_node": num_node}
 model = StreamSpatialTemporalGraph(in_channels=3, graph_args=graph_args,
                                    num_class=num_class,

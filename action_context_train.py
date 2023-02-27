@@ -11,13 +11,30 @@ import os
 # gpus = tf.config.list_physical_devices('GPU')
 # tf.config.experimental.set_memory_growth(gpus[0], True)
 
+dataset = 'UR'
+topology = "AlphaPose"
+
+if dataset == 'Le2iFall':
+    class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
+                'Stand up', 'Sit down', 'Fall Down']
+elif dataset == 'MultipleCameraFall':
+    class_names = [
+        "Moving horizontally", "Walking, standing up", "Falling",
+        "Lying on the ground", "Crounching", "Moving down", "Moving up",
+        "Sitting", "Lying on a sofa"
+    ]
+elif dataset == 'UR':
+    class_names = ["Fall", "Lying", "Not Lying"]
+else:
+    raise ValueError("Dataset not found!")
+
 parser = argparse.ArgumentParser(description='tune vgg16 network on new dataset')
 
 
 parser.add_argument(
     "--classes",
     type=int,
-    default=7,
+    default=len(class_names),
     help="number of classes in target dataset")
 
 parser.add_argument(
@@ -127,7 +144,7 @@ if os.path.exists(args.save_model):
     model = load_model(args.save_model)
     
 if correct_model:
-    df = pd.read_csv('data/UR/AlphaPose/Frames_label.csv')
+    df = pd.read_csv(f'data/{dataset}/{topology}/Frames_label.csv')
     datagen = ImageDataGenerator(
         rescale=1./255,
         featurewise_center=True,

@@ -62,7 +62,7 @@ if topology == "AlphaPose":
 elif topology == "OpenPose":
     num_node = 18
 elif topology == "BlazePose":
-    num_node = 21
+    num_node = 22
 else:
     raise ValueError("Wrong Topology")
 class_names = sorted(class_names)

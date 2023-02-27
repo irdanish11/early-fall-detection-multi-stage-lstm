@@ -102,7 +102,7 @@ def data_topology_info(dataset, topology):
     keypoints_num = {
         "AlphaPose": 14,
         "OpenPose": 18,
-        # "BlazePose": 24,
+        "BlazePose": 22,
     }
     class_names = classes[dataset]
     num_node = keypoints_num[topology]

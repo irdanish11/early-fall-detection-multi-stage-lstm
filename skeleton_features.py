@@ -47,7 +47,7 @@ if topology == "AlphaPose":
 elif topology == "OpenPose":
     num_node = 18
 elif topology == "BlazePose":
-    num_node = 21
+    num_node = 22
 else:
     raise ValueError("Wrong Topology")
 save_folder = 'saved/SSTG(pts)-01(cf+hm-hm)'

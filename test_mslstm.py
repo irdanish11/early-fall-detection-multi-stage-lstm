@@ -126,8 +126,10 @@ def main(new: bool = True):
     topology = "AlphaPose"
     dataset = "UR"
     if new:
+        print("Using new inference!")
         run_inference(dataset, topology)
     else:
+        print("Using old inference!")
         if dataset == "Le2iFall":
             test_le2i_fall(dataset, topology, model)
         elif dataset == "UR":

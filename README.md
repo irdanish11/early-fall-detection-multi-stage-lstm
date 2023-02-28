@@ -6,9 +6,17 @@
 python create_dataset_2.py
 ```
 
+Change Topology according to your need.
 ```shell
 # For MultipleCameraFall
 python extract_video_frames.py
+keypoint_data_mcf
+```
+
+Change Topology according to your need.
+```shell
+# For UR Dataset
+keypoint_data_ur
 ```
 
 ### 1.2. Change the value of the variable `dataset` and `topology` in `stgcn_train.py` according to you needs. Train the skeleton model (pytorch environment) by running the following command in terminal:
@@ -50,10 +58,15 @@ python make_split.py
 python ms_lstm.py --device 0 --classes 7
 ```
 
-### 1.9 Change the value of the variable `num_node` in `main_mslstm.py` according to the topology e.g for AlphaPose value should be 14, for OpenPose values should be 18. Generate Metrics and reports for our approach
+### 1.9 Perform predictions for our approach
 ```bash
 python test_mslstm.py
 ``` 
+
+### 1.10 Change the value of `dataset` and `topology` according to your needs. To generate the metrics and report run:
+```bash
+python metrics.py
+```
 
 ### 1.9. Now for results, set the following variables accordingly for each file:
 ```bash

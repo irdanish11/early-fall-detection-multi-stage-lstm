@@ -139,6 +139,8 @@ action_aware = get_action_aware_model(model_action)
 
 classes = sorted(class_names)
 
+print(f"Loading CSV file: {frames_csv}")
+print(f"Classes Names: {class_names}")
 df = pd.read_csv(frames_csv)
 if dataset == 'Le2iFall':
     df['video_name'] = df['video'].str.split('_')

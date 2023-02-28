@@ -64,16 +64,16 @@ def get_blazepose_keypoint(json_path, df_labels):
         pose = d["skeleton"][0]["pose"]
         if len(pose) > 0:
             try:
-                keypoints.append(pose)
                 frame_id = d["frame_index"]
-                frame_ids.append(frame_id)
-                frame_name = "{}-rgb-{:03}.png".format(prefix, frame_id)
                 label = int(df_labels[
                     (df_labels["sequenceName"] == seq_name) &
                     (df_labels["frameNumber"] == frame_id)
                 ].label)
+                frame_ids.append(frame_id)
+                frame_name = "{}-rgb-{:03}.png".format(prefix, frame_id)
                 names.append(frame_name)
                 labels.append(classes[label])
+                keypoints.append(pose)
             except TypeError as te:
                 print(f"Error in frame: {i}")
     df = pd.DataFrame({

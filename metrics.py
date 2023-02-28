@@ -244,27 +244,37 @@ def read_json(filename):
     return data
 
 
-def csv_file_list(dataset, label_out_dir):
-    if dataset == "Le2iFall":
-        scenarios = ["Coffee_room", "Home"]
-        classes = ["Fall Down", "Lying Down", "Not Fall"]
-        csv_files = []
-        for scenario in scenarios:
-            results_dir = os.path.join(label_out_dir, scenario)
-            scenario_files = glob(os.path.join(results_dir, "*.csv"))
-            csv_files.extend(scenario_files)
-    elif dataset == "UR":
-        classes = ["Fall", "Lying", "Not Fall"]
-        csv_files = glob(os.path.join(label_out_dir, "*.csv"))
-    elif dataset == "MultipleCameraFall":
-        classes = ["Falling", "Lying on the ground", "Not Fall"]
-        csv_files = []
+def csv_file_list(dataset, label_out_dir, new):
+    if new:
+        path = label_out_dir.replace("/CSV", "")
+        csv_files = glob(os.path.join(path, "*.csv"))
     else:
-        raise ValueError("Invalid Dataset Name")
-    return csv_files, classes
+        if dataset == "Le2iFall":
+            scenarios = ["Coffee_room", "Home"]
+            csv_files = []
+            for scenario in scenarios:
+                results_dir = os.path.join(label_out_dir, scenario)
+                scenario_files = glob(os.path.join(results_dir, "*.csv"))
+                csv_files.extend(scenario_files)
+        elif dataset == "UR":
+            csv_files = glob(os.path.join(label_out_dir, "*.csv"))
+        elif dataset == "MultipleCameraFall":
+            csv_files = []
+        else:
+            raise ValueError("Invalid Dataset Name")
+            # classes
+        if dataset == "Le2iFall":
+            classes = ["Fall Down", "Lying Down", "Not Fall"]
+        elif dataset == "UR":
+            classes = ["Fall", "Lying", "Not Fall"]
+        elif dataset == "MultipleCameraFall":
+            classes = ["Falling", "Lying on the ground", "Not Fall"]
+        else:
+            raise ValueError("Invalid Dataset Name")
+        return csv_files, classes
 
 
-def main():
+def main(new: bool = True):
     model = "mslstm"
     topology = "AlphaPose"
     dataset = "UR" # "Le2iFall"
@@ -272,7 +282,7 @@ def main():
     pred_key = "mslstm_pred_label"
     model_path = os.path.join(dataset, topology)
     label_out_dir = os.path.join("results", dataset, topology, "CSV")
-    csv_files, classes = csv_file_list(dataset, label_out_dir)
+    csv_files, classes = csv_file_list(dataset, label_out_dir, new)
     keep_classes = classes[:2]
     df_pred = pd.DataFrame()
     all_scores = []
@@ -301,10 +311,11 @@ def main():
             [df_pred, df[["label", pred_key]]],
             ignore_index=True
         )
-    print(f"{i+1}/{len(csv_files)}")
+    print(f"\n{i+1}/{len(csv_files)}")
     y_score = np.array(all_scores)
+    print(f"Computing Metrics for dataset: `{dataset}` & Topology: `{topology}`")
     all_metrics = compute_metrics(df_pred, classes, y_score, model_path)
 
 
 if __name__ == "__main__":
-    main()
+    main(new=True)

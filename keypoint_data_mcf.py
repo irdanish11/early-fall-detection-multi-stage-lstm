@@ -2,28 +2,63 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from glob import glob
 from sklearn.preprocessing import OneHotEncoder
 from keypoint_data_le2ifall import read_json, dump_pickle
 
 
-def get_alphapose_keypoint(json_path, frame_data, s, c):
-    json_file = "alphapose-results.json"
-    try:
-        json_data = read_json(os.path.join(json_path, json_file))
-        fr_names = frame_data["frames"][s][c]
-        fr_numbers = frame_data["frame_numbers"][s][c]
-        fr_labels = frame_data["frame_labels"][s][c]
-        keypoints, names, labels, frame_ids = [], [], [], []
-        for d in json_data:
-            frame_id = int(d["image_id"].split(".")[0])
-            if frame_id in fr_numbers:
-                index = fr_numbers.index(frame_id)
-                keypoints.append(d["keypoints"])
-                names.append(fr_names[index])
-                labels.append(fr_labels[index])
+def get_alpha_open_pose_keypoint(json_path, frame_data):
+    split = json_path.split("/")
+    scenario, cam = split[-2], split[-1]
+    seq_name = f"{scenario}-cam"
+    frame_labels = frame_data["frame_labels"][scenario][cam]
+    files = sorted(glob(os.path.join(json_path, "*.json")))
+    keypoints, names, labels, frame_ids = [], [], [], []
+    if len(files) > 0:
+        counter = 0
+        for f in files:
+            data = read_json(f)
+            frame_id = int(f.replace(".json", "").split("/")[-1].split("_")[1])
+            frame_name = f"{seq_name}-{frame_id}.png"
+            try:
+                kp_data = data["people"][0]["pose_keypoints_2d"]
+                labels.append(frame_labels[frame_id])
+                keypoints.append(kp_data)
+                names.append(frame_name)
                 frame_ids.append(frame_id)
-    except FileNotFoundError:
-        keypoints, names, labels, frame_ids = [], [], [], []
+            except IndexError as e:
+                # print(f"Index error at: {scenario}/{cam}/{f.split('/')[-1]}")
+                counter += 1
+        print(f"No data found for {counter}/{len(files)} files.")
+    df = pd.DataFrame({
+        "video": names,
+        "label": labels
+    })
+    return df, keypoints
+
+
+def get_blazepose_keypoint(json_path, frame_data):
+    split = json_path.replace(".json", "").split("/")
+    scenario, cam = split[-2], split[-1]
+    frame_labels = frame_data["frame_labels"][scenario][cam]
+    seq_name = f"{scenario}-cam"
+    keypoints, names, labels, frame_ids = [], [], [], []
+    json_data = read_json(json_path)
+    for i, d in enumerate(json_data["data"]):
+        try:
+            pose = d["skeleton"][0]["pose"]
+            if len(pose) > 0:
+                frame_id = d["frame_index"] - 1
+                frame_name = f"{seq_name}-{frame_id}.png"
+                label = frame_labels[frame_id]
+                frame_ids.append(frame_id)
+                names.append(frame_name)
+                labels.append(label)
+                keypoints.append(pose)
+        except TypeError as te:
+            print(f"Error in frame: {i}")
+        except KeyError as ke:
+            print(f"Key Error at {i}")
     df = pd.DataFrame({
         "video": names,
         "label": labels
@@ -33,7 +68,9 @@ def get_alphapose_keypoint(json_path, frame_data, s, c):
 
 def main(path, topology, dataset):
     kp_directories = {
-        "AlphaPose": "montreal_dataset_ap_json"
+        "AlphaPose": "montreal_dataset_ap_json",
+        "OpenPose": "montreal_dataset_op_json",
+        "BlazePose": "montreal_dataset_bp_json",
     }
     top_path = os.path.join(path, "Topologies", kp_directories[topology])
     scenarios = os.listdir(top_path)
@@ -48,9 +85,10 @@ def main(path, topology, dataset):
         cams.sort()
         for c in cams:
             json_path = os.path.join(sc_path, c)
-            df_c, keypoints = get_alphapose_keypoint(
-                json_path, frame_data, s, c
-            )
+            if topology == "AlphaPose" or topology == "OpenPose":
+                df_c, keypoints = get_alpha_open_pose_keypoint(json_path, frame_data)
+            else:
+                df_c, keypoints = get_blazepose_keypoint(json_path, frame_data)
             if len(keypoints) > 0:
                 all_dfs.append(df_c)
                 all_keypoints.extend(keypoints)
@@ -75,6 +113,7 @@ def main(path, topology, dataset):
 
 if __name__ == '__main__':
     dataset_name = 'MultipleCameraFall'
+    # path = "/run/media/danish/404/Mot/mot/MultipleCamerasFall"
     topology_path = f'datasets/{dataset_name}'
     topology_name = 'AlphaPose'
     main(topology_path, topology_name, dataset_name)

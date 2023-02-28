@@ -30,7 +30,11 @@ def get_alpha_open_pose_keypoint(json_path, frame_data, topology):
             try:
                 kp_data = data["people"][0]["pose_keypoints_2d"]
                 labels.append(frame_labels[frame_id])
-                keypoints.append(kp_data)
+                if len(kp_data) == 45:
+                    kp_data = np.array(kp_data).reshape(3, 15)[:, :14]
+                    keypoints.append(kp_data.flatten().tolist())
+                else:
+                    keypoints.append(kp_data)
                 names.append(frame_name)
                 frame_ids.append(frame_id)
             except IndexError as e:

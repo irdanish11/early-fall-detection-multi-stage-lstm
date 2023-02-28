@@ -125,6 +125,7 @@ def main(new: bool = True):
     model = "mslstm"
     topology = "AlphaPose"
     dataset = "MultipleCameraFall"
+    print(f"MSLSTM Predictions for dataset: `{dataset}, topology : `{topology}`")
     if new:
         print("Using new inference!")
         run_inference(dataset, topology)

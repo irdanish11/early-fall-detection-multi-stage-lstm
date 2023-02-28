@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 dataset = 'MultipleCameraFall'
 topology = "AlphaPose"
+print(f"Extracting Action Features for dataset: `{dataset}, topology : `{topology}`")
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',

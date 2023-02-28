@@ -13,6 +13,7 @@ import os
 
 dataset = 'MultipleCameraFall'
 topology = "AlphaPose"
+print(f"Training Action Model for dataset: `{dataset}, topology : `{topology}`")
 
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',

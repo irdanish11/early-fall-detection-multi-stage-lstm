@@ -34,6 +34,7 @@ batch_size = 32
 
 dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
 topology = "AlphaPose"
+print(f"Skeleton Model Training for dataset: `{dataset}, topology : `{topology}`")
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
                    'Stand up', 'Sit down', 'Fall Down']

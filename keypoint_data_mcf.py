@@ -7,10 +7,10 @@ from sklearn.preprocessing import OneHotEncoder
 from keypoint_data_le2ifall import read_json, dump_pickle
 
 
-def get_alpha_open_pose_keypoint(json_path, frame_data):
+def get_alpha_open_pose_keypoint(json_path, frame_data, topology):
     split = json_path.split("/")
     scenario, cam = split[-2], split[-1]
-    seq_name = f"{scenario}-cam"
+    seq_name = f"{scenario}-{cam}"
     frame_labels = frame_data["frame_labels"][scenario][cam]
     files = sorted(glob(os.path.join(json_path, "*.json")))
     keypoints, names, labels, frame_ids = [], [], [], []
@@ -18,7 +18,14 @@ def get_alpha_open_pose_keypoint(json_path, frame_data):
         counter = 0
         for f in files:
             data = read_json(f)
-            frame_id = int(f.replace(".json", "").split("/")[-1].split("_")[1])
+            if topology == "OpenPose":
+                frame_id = int(
+                    f.replace(".json", "").split("/")[-1].split("_")[1]
+                )
+            elif topology == "AlphaPose":
+                frame_id = int(f.split("-")[-1].split("_")[0])
+            else:
+                raise ValueError(f"Invalid topology provided: {topology}")
             frame_name = f"{seq_name}-{frame_id}.png"
             try:
                 kp_data = data["people"][0]["pose_keypoints_2d"]
@@ -66,6 +73,7 @@ def get_blazepose_keypoint(json_path, frame_data):
     return df, keypoints
 
 
+
 def main(path, topology, dataset):
     print(f"Preparing Keypoints for dataset: `{dataset}`, topology `{topology}`")
     kp_directories = {
@@ -87,7 +95,9 @@ def main(path, topology, dataset):
         for c in cams:
             json_path = os.path.join(sc_path, c)
             if topology == "AlphaPose" or topology == "OpenPose":
-                df_c, keypoints = get_alpha_open_pose_keypoint(json_path, frame_data)
+                df_c, keypoints = get_alpha_open_pose_keypoint(
+                    json_path, frame_data, topology
+                )
             else:
                 df_c, keypoints = get_blazepose_keypoint(json_path, frame_data)
             if len(keypoints) > 0:

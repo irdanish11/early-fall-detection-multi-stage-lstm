@@ -36,7 +36,8 @@ def get_alpha_open_pose_keypoint(json_path, frame_data, topology):
             except IndexError as e:
                 # print(f"Index error at: {scenario}/{cam}/{f.split('/')[-1]}")
                 counter += 1
-        print(f"No data found for {counter}/{len(files)} files.")
+        if counter > 0:
+            print(f"No data found for {counter}/{len(files)} files.")
     df = pd.DataFrame({
         "video": names,
         "label": labels
@@ -71,7 +72,6 @@ def get_blazepose_keypoint(json_path, frame_data):
         "label": labels
     })
     return df, keypoints
-
 
 
 def main(path, topology, dataset):

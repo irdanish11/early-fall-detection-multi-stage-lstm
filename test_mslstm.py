@@ -124,7 +124,7 @@ def main(new: bool = True):
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     model = "mslstm"
     topology = "AlphaPose"
-    dataset = "UR"
+    dataset = "MultipleCameraFall"
     if new:
         print("Using new inference!")
         run_inference(dataset, topology)

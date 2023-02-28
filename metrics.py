@@ -277,7 +277,7 @@ def csv_file_list(dataset, label_out_dir, new):
 def main(new: bool = True):
     model = "mslstm"
     topology = "AlphaPose"
-    dataset = "UR" # "Le2iFall"
+    dataset = "MultipleCameraFall" # "Le2iFall"
     # base_dir = "/home/danish/Documents/mot"
     pred_key = "mslstm_pred_label"
     model_path = os.path.join(dataset, topology)

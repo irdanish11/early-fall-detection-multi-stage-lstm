@@ -16,7 +16,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 # data_files = ['data/Home_new-set(labelXscrw)_pred.pkl',
 #               'data/Coffee_room_new-set(labelXscrw)_pred.pkl']
-dataset = 'UR' # 'Le2iFall', 'MultipleCameraFall' or 'UR
+dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
 topology = "AlphaPose"
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':

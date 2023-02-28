@@ -22,7 +22,7 @@ def natural_keys(text):
 
 data_dirs = ['data/action_features/',
              'data/skeleton_features/']
-dataset = "UR"
+dataset = "MultipleCameraFall"
 val_size = 0.2
 
 for data_dir in tqdm(data_dirs):

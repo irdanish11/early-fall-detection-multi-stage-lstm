@@ -9,7 +9,7 @@ from tensorflow.keras.layers import Input, ZeroPadding2D, Conv2D, AveragePooling
 from tensorflow.keras.models import Model
 from tqdm import tqdm
 
-dataset = 'UR'
+dataset = 'MultipleCameraFall'
 topology = "AlphaPose"
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':

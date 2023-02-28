@@ -11,7 +11,7 @@ import os
 # gpus = tf.config.list_physical_devices('GPU')
 # tf.config.experimental.set_memory_growth(gpus[0], True)
 
-dataset = 'UR'
+dataset = 'MultipleCameraFall'
 topology = "AlphaPose"
 
 if dataset == 'Le2iFall':

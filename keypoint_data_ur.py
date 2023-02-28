@@ -89,6 +89,7 @@ def main(path, topology, dataset):
         "OpenPose": "rzeszow_dataset_op_json",
         "BlazePose": "rzeszow_dataset_bp_json",
     }
+    print(f"Preparing Keypoints for dataset: `{dataset}`, topology `{topology}`")
     top_path = os.path.join(path, "Topologies", kp_directories[topology])
     df_labels = pd.read_csv(os.path.join(path, "urfall-cam0-falls.csv"))
     videos = os.listdir(top_path)

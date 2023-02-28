@@ -67,6 +67,7 @@ def get_blazepose_keypoint(json_path, frame_data):
 
 
 def main(path, topology, dataset):
+    print(f"Preparing Keypoints for dataset: `{dataset}`, topology `{topology}`")
     kp_directories = {
         "AlphaPose": "montreal_dataset_ap_json",
         "OpenPose": "montreal_dataset_op_json",

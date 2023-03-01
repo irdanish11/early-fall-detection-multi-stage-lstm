@@ -55,8 +55,13 @@ def get_blazepose_keypoint(json_file):
 
 
 def read_le2ifall(path: str, topology: str):
+    top_paths = {
+        "AlphaPose": "Le2i_FallDataset_ap_json",
+        "OpenPose": "Le2i_FallDataset_op_json",
+        "BlazePose": "Le2i_FallDataset_bp_json",
+    }
     sub_dirs = ["Coffee_room", "Home"]
-    top_path = os.path.join(path, topology)
+    top_path = os.path.join(path, topology, top_paths[topology])
     dir_lst = os.listdir(top_path)
     key_points = {k: [] for k in sub_dirs}
     kp_paths = deepcopy(key_points)
@@ -146,8 +151,12 @@ def main(path, topology):
 
 
 if __name__ == "__main__":
-    topology_path = "/home/danish/Documents/mot/Le2iFall/data"
-    topology_name = "OpenPose"
+    dataset_name = 'Le2iFall'
+    # path = "/run/media/danish/404/Mot/mot/MultipleCamerasFall"
+    topology_path = f'datasets/{dataset_name}'
+    topology_name = 'BlazePose'
+    # topology_path = "/home/danish/Documents/mot/Le2iFall/data"
+    # topology_name = "OpenPose"
     main(topology_path, topology_name)
 
 

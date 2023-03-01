@@ -53,7 +53,7 @@ def get_blazepose_keypoint(json_path, frame_data):
     split = json_path.replace(".json", "").split("/")
     scenario, cam = split[-2], split[-1]
     frame_labels = frame_data["frame_labels"][scenario][cam]
-    seq_name = f"{scenario}-cam"
+    seq_name = f"{scenario}-{cam}"
     keypoints, names, labels, frame_ids = [], [], [], []
     json_data = read_json(json_path)
     for i, d in enumerate(json_data["data"]):

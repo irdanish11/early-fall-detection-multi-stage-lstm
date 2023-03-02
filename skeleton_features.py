@@ -23,10 +23,15 @@ frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
                    'Stand up', 'Sit down', 'Fall Down']
-    data_files = [
-        f'data/{dataset}/{topology}/{dataset}-{topology}-Coffee_room.pkl',
-        f'data/{dataset}/{topology}/{dataset}-{topology}-Home.pkl'
-    ]
+    if topology == "AlphaPose":
+        data_files = [
+            f'data/{dataset}/{topology}/{dataset}-{topology}-Coffee_room.pkl',
+            f'data/{dataset}/{topology}/{dataset}-{topology}-Home.pkl'
+        ]
+    else:
+        data_files = [
+            f'data/{dataset}/{topology}/{dataset}-{topology}.pkl',
+        ]
 elif dataset == 'MultipleCameraFall':
     class_names = [
         "Moving horizontally", "Walking, standing up", "Falling",

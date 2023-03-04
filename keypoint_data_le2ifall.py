@@ -36,10 +36,10 @@ def get_openpose_keypoint(frame_labels, top_path, filter_keys):
     scenarios = list_scenarios(top_path, filter_keys)
     files = []
     for s in scenarios:
-        sc_path = os.path.join(top_path, s)
-        videos = os.listdir(sc_path)
+        # sc_path = os.path.join(top_path, s)
+        videos = os.listdir(s)
         for v in videos:
-            files.extend(glob("/".join([sc_path, v, "*.json"])))
+            files.extend(glob("/".join([s, v, "*.json"])))
     files = sorted(files)
     ke_counter, te_counter = 0, 0
     keypoints, names, labels = [], [], []

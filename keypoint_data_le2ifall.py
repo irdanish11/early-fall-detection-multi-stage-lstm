@@ -83,7 +83,7 @@ def get_blazepose_keypoint(frame_labels, top_path, filter_keys):
         te_counter, ke_counter = 0, 0
         json_data = read_json(f)
         split = f.replace(".json", "").split("/")
-        scenario = split[-2].split("_")[1]
+        scenario = split[-2].split("_")[0]
         video = split[-1]
         seq_name = f"{scenario}_{video}"
         for i, d in enumerate(json_data["data"]):

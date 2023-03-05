@@ -34,12 +34,12 @@ batch_size = 32
 #   channels: Inputs data (x, y and scores), Default: 3
 #   num_class: Number of pose class to train, Default: 7
 
-dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
+dataset = 'Le2iFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
 topology = "OpenPose"
 print(f"Skeleton Model Training for dataset: `{dataset}, topology : `{topology}`")
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-                   'Stand up', 'Sit down', 'Fall Down', 'Stand Up']
+                   'Sit Down', 'Fall Down', 'Stand Up']
     if topology == "AlphaPose":
         data_files = [
             f'data/{dataset}/{topology}/{dataset}-{topology}-Coffee_room.pkl',

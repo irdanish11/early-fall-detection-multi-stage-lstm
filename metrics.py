@@ -277,7 +277,7 @@ def csv_file_list(dataset, label_out_dir, new):
 def main(new: bool = True):
     model = "mslstm"
     topology = "OpenPose"
-    dataset = "MultipleCameraFall" # "Le2iFall"
+    dataset = "Le2iFall" # "Le2iFall"
     print(f"Computing Metrics for dataset: `{dataset}` & Topology: `{topology}`")
     # base_dir = "/home/danish/Documents/mot"
     pred_key = "mslstm_pred_label"

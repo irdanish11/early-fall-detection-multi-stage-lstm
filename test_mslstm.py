@@ -24,7 +24,7 @@ class MSLSTMConfiguration:
 def get_classes_list(dataset, topology):
     if dataset == 'Le2iFall':
         class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-                       'Stand up', 'Sit down', 'Fall Down', 'Stand Up']
+                       'Sit Down', 'Fall Down', 'Stand Up']
     elif dataset == 'MultipleCameraFall':
         class_names = [
             "Moving horizontally", "Walking, standing up", "Falling",
@@ -126,8 +126,8 @@ def run_inference(dataset, topology):
 def main(new: bool = True):
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     model = "mslstm"
-    topology = "AlphaPose"
-    dataset = "MultipleCameraFall"
+    topology = "OpenPose"
+    dataset = "Le2iFall"
     print(
         f"MSLSTM Predictions for dataset: `{dataset}, topology : `{topology}`")
     if new:

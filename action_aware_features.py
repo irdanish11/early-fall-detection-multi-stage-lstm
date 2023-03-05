@@ -9,13 +9,13 @@ from tensorflow.keras.layers import Input, ZeroPadding2D, Conv2D, AveragePooling
 from tensorflow.keras.models import Model
 from tqdm import tqdm
 
-dataset = 'MultipleCameraFall'
+dataset = 'Le2iFall'
 topology = "OpenPose"
 print(f"Extracting Action Features for dataset: `{dataset}, topology : `{topology}`")
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-                   'Stand up', 'Sit down', 'Fall Down', 'Stand Up']
+                   'Sit Down', 'Fall Down', 'Stand Up']
 elif dataset == 'MultipleCameraFall':
     class_names = [
         "Moving horizontally", "Walking, standing up", "Falling",
@@ -168,7 +168,7 @@ vid_list = df['video_name'].unique()
 labels_dir = "data/csv_labels"
 os.makedirs(labels_dir, exist_ok=True)
 print("\n\nGenerating Action Aware Features!\n\n")
-for vid in tqdm(vid_list):
+for vid in tqdm(vid_list[40:]):
     vid_df = vid_frames.get_group(vid)
     # df_tmp = vid_df.copy()
     n = 0

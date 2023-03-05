@@ -11,13 +11,13 @@ import os
 # gpus = tf.config.list_physical_devices('GPU')
 # tf.config.experimental.set_memory_growth(gpus[0], True)
 
-dataset = 'MultipleCameraFall'
+dataset = 'Le2iFall'
 topology = "OpenPose"
 print(f"Training Action Model for dataset: `{dataset}, topology : `{topology}`")
 
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-                   'Stand up', 'Sit down', 'Fall Down', 'Stand Up']
+                   'Sit Down', 'Fall Down', 'Stand Up']
 elif dataset == 'MultipleCameraFall':
     class_names = [
         "Moving horizontally", "Walking, standing up", "Falling",

@@ -17,7 +17,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 # data_files = ['data/Home_new-set(labelXscrw)_pred.pkl',
 #               'data/Coffee_room_new-set(labelXscrw)_pred.pkl']
 dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
-topology = "AlphaPose"
+topology = "OpenPose"
 print(f"Extracting Skeleton Features for dataset: `{dataset}, topology : `{topology}`")
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':

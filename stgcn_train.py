@@ -33,7 +33,7 @@ batch_size = 32
 #   num_class: Number of pose class to train, Default: 7
 
 dataset = 'MultipleCameraFall' # 'Le2iFall', 'MultipleCameraFall' or 'UR
-topology = "AlphaPose"
+topology = "OpenPose"
 print(f"Skeleton Model Training for dataset: `{dataset}, topology : `{topology}`")
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',

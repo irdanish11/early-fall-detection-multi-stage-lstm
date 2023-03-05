@@ -55,7 +55,7 @@ python make_split.py
 
 ### 1.8. Train the final model by command (change the number of classes accordingly):
 ```bash
-python ms_lstm.py --device 0 --classes 7
+python ms_lstm.py --device 0 --classes 9 --workers 4 --batch-size 64
 ```
 
 ### 1.9 Perform predictions for our approach

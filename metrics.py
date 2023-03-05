@@ -263,15 +263,15 @@ def csv_file_list(dataset, label_out_dir, new):
         else:
             raise ValueError("Invalid Dataset Name")
             # classes
-        if dataset == "Le2iFall":
-            classes = ["Fall Down", "Lying Down", "Not Fall"]
-        elif dataset == "UR":
-            classes = ["Fall", "Lying", "Not Fall"]
-        elif dataset == "MultipleCameraFall":
-            classes = ["Falling", "Lying on the ground", "Not Fall"]
-        else:
-            raise ValueError("Invalid Dataset Name")
-        return csv_files, classes
+    if dataset == "Le2iFall":
+        classes = ["Fall Down", "Lying Down", "Not Fall"]
+    elif dataset == "UR":
+        classes = ["Fall", "Lying", "Not Fall"]
+    elif dataset == "MultipleCameraFall":
+        classes = ["Falling", "Lying on the ground", "Not Fall"]
+    else:
+        raise ValueError("Invalid Dataset Name")
+    return csv_files, classes
 
 
 def main(new: bool = True):

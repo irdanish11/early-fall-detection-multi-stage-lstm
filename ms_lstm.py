@@ -85,7 +85,7 @@ parser.add_argument(
 
 parser.add_argument(
     "--workers",
-    default=1,
+    default=4,
     type=int,
     help="number of data preprocessing worker threads to launch")
 

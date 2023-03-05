@@ -12,7 +12,7 @@ import os
 # tf.config.experimental.set_memory_growth(gpus[0], True)
 
 dataset = 'MultipleCameraFall'
-topology = "AlphaPose"
+topology = "OpenPose"
 print(f"Training Action Model for dataset: `{dataset}, topology : `{topology}`")
 
 if dataset == 'Le2iFall':

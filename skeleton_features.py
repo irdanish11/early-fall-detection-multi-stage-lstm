@@ -41,6 +41,9 @@ elif dataset == 'MultipleCameraFall':
     data_files = [
         f'data/{dataset}/{topology}/{dataset}-{topology}.pkl',
     ]
+    if topology == "OpenPose":
+        df = pd.read_csv(f"data/{dataset}/{topology}/Frames_label.csv")
+        class_names = df.label.unique().tolist()
 elif dataset == 'UR':
     class_names = ["Fall", "Lying", "Not Lying"]
     data_files = [

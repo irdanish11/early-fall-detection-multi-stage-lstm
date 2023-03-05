@@ -10,7 +10,7 @@ from tensorflow.keras.models import Model
 from tqdm import tqdm
 
 dataset = 'MultipleCameraFall'
-topology = "AlphaPose"
+topology = "OpenPose"
 print(f"Extracting Action Features for dataset: `{dataset}, topology : `{topology}`")
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
@@ -22,6 +22,9 @@ elif dataset == 'MultipleCameraFall':
         "Lying on the ground", "Crounching", "Moving down", "Moving up",
         "Sitting", "Lying on a sofa"
     ]
+    if topology == "OpenPose":
+        df = pd.read_csv(f"data/{dataset}/{topology}/Frames_label.csv")
+        class_names = df.label.unique().tolist()
 elif dataset == 'UR':
     class_names = ["Fall", "Lying", "Not Lying"]
 else:

@@ -130,7 +130,7 @@ if __name__ == '__main__':
         os.makedirs(save_folder)
 
     # DATA.
-    if dataset == "Le2iFall":
+    if dataset == "Le2iFall" and topology == "AlphaPose":
         train_loader, _ = load_dataset(data_files[0:1], batch_size, 0.2)
         valid_loader, train_loader_ = load_dataset(data_files[1:2], batch_size, 0.2)
 

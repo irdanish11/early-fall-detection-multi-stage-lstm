@@ -24,6 +24,10 @@ elif dataset == 'MultipleCameraFall':
         "Lying on the ground", "Crounching", "Moving down", "Moving up",
         "Sitting", "Lying on a sofa"
     ]
+    if topology == "OpenPose":
+        df = pd.read_csv(f"data/{dataset}/{topology}/Frames_label.csv")
+        class_names = df.label.unique().tolist()
+        print(f"Number of classes: {len(class_names)}")
 elif dataset == 'UR':
     class_names = ["Fall", "Lying", "Not Lying"]
 else:

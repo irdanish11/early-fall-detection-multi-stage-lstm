@@ -15,7 +15,7 @@ print(f"Extracting Action Features for dataset: `{dataset}, topology : `{topolog
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-                   'Stand up', 'Sit down', 'Fall Down']
+                   'Stand up', 'Sit down', 'Fall Down', 'Stand Up']
 elif dataset == 'MultipleCameraFall':
     class_names = [
         "Moving horizontally", "Walking, standing up", "Falling",

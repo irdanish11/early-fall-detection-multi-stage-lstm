@@ -22,7 +22,7 @@ print(f"Extracting Skeleton Features for dataset: `{dataset}, topology : `{topol
 frames_csv = os.path.join('data', dataset, topology, 'Frames_label.csv')
 if dataset == 'Le2iFall':
     class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-                   'Stand up', 'Sit down', 'Fall Down']
+                   'Stand up', 'Sit down', 'Fall Down', 'Stand Up']
     if topology == "AlphaPose":
         data_files = [
             f'data/{dataset}/{topology}/{dataset}-{topology}-Coffee_room.pkl',

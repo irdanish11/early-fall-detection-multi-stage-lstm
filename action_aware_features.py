@@ -168,7 +168,7 @@ vid_list = df['video_name'].unique()
 labels_dir = "data/csv_labels"
 os.makedirs(labels_dir, exist_ok=True)
 print("\n\nGenerating Action Aware Features!\n\n")
-for vid in tqdm(vid_list[40:]):
+for vid in tqdm(vid_list):
     vid_df = vid_frames.get_group(vid)
     # df_tmp = vid_df.copy()
     n = 0

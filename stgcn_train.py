@@ -1,5 +1,7 @@
 import os
 import time
+
+import pandas as pd
 import torch
 import pickle
 import numpy as np
@@ -56,6 +58,10 @@ elif dataset == 'MultipleCameraFall':
     data_files = [
         f'data/{dataset}/{topology}/{dataset}-{topology}.pkl',
     ]
+    if topology == "OpenPose":
+        df = pd.read_csv(f"data/{dataset}/{topology}/Frames_label.csv")
+        class_names = df.label.unique().tolist()
+
 elif dataset == 'UR':
     class_names = ["Fall", "Lying", "Not Lying"]
     data_files = [
@@ -73,7 +79,7 @@ else:
     raise ValueError("Wrong Topology")
 class_names = sorted(class_names)
 num_class = len(class_names)
-
+print(f"Number of classes: {num_class}")
 
 def load_dataset(data_files, batch_size, split_size=0):
     """Load data files into torch DataLoader with/without spliting train-test.

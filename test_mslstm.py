@@ -5,6 +5,7 @@ from tqdm import tqdm
 import pandas as pd
 import os
 
+
 # os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 
@@ -20,16 +21,18 @@ class MSLSTMConfiguration:
     lstm_weight_file = 'data/model_weights/ms_lstm_best.h5'
 
 
-def get_classes_list(dataset):
+def get_classes_list(dataset, topology):
     if dataset == 'Le2iFall':
         class_names = ['Standing', 'Walking', 'Sitting', 'Lying Down',
-                    'Stand up', 'Sit down', 'Fall Down']
+                       'Stand up', 'Sit down', 'Fall Down']
     elif dataset == 'MultipleCameraFall':
         class_names = [
             "Moving horizontally", "Walking, standing up", "Falling",
             "Lying on the ground", "Crounching", "Moving down", "Moving up",
             "Sitting", "Lying on a sofa"
         ]
+        df = pd.read_csv(f"data/{dataset}/{topology}/Frames_label.csv")
+        class_names = df.label.unique().tolist()
     elif dataset == 'UR':
         class_names = ["Fall", "Lying", "Not Lying"]
     else:
@@ -104,7 +107,7 @@ def test_ur(dataset, topology):
     label_file = os.path.join("data", dataset, topology, "Frames_label.csv")
     label_out_dir = os.path.join("results", dataset, topology, "CSV")
     os.makedirs(label_out_dir, exist_ok=True)
-    args = MSLSTMConfiguration()
+    args = MSLSTMConfiguration("")
     args.dataset = dataset
     args.topology = topology
     test_vid_ur(args, label_file, label_out_dir)
@@ -114,7 +117,7 @@ def run_inference(dataset, topology):
     args = MSLSTMConfiguration("")
     args.dataset = dataset
     args.topology = topology
-    class_names = get_classes_list(args.dataset)
+    class_names = get_classes_list(args.dataset, topology)
     args.class_names = class_names
     args.num_class = len(class_names)
     inference(args)
@@ -125,7 +128,8 @@ def main(new: bool = True):
     model = "mslstm"
     topology = "AlphaPose"
     dataset = "MultipleCameraFall"
-    print(f"MSLSTM Predictions for dataset: `{dataset}, topology : `{topology}`")
+    print(
+        f"MSLSTM Predictions for dataset: `{dataset}, topology : `{topology}`")
     if new:
         print("Using new inference!")
         run_inference(dataset, topology)

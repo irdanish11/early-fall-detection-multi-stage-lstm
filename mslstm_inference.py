@@ -65,8 +65,9 @@ def check_consensus(files):
     suffixes = set(list(map(lambda x: x.split("_")[-1], names)))
     if len(prefixes) != 1 and len(suffixes) != 1:
         raise ValueError("Inconsistent file names")
-    split = names[0].replace("npy", "csv").split("_")
-    split[1] = "csvlabel"
+    # split = names[0].replace("npy", "csv").split("_")
+    # split[1] = "csvlabel"
+    label_name = names[1].replace("_feature_", "_csvlabel_").replace(".npy", ".csv")
     label_path = "data/csv_labels"
     label_file = os.path.join(label_path, "_".join(split))
     if not os.path.exists(label_file):

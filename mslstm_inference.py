@@ -69,7 +69,8 @@ def check_consensus(files):
     # split[1] = "csvlabel"
     label_name = names[1].replace("_feature_", "_csvlabel_").replace(".npy", ".csv")
     label_path = "data/csv_labels"
-    label_file = os.path.join(label_path, "_".join(split))
+    # label_file = os.path.join(label_path, "_".join(split))
+    label_file = os.path.join(label_path, label_name)
     if not os.path.exists(label_file):
         raise ValueError("Label file not found")
     return label_file
